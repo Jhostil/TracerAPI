@@ -24,4 +24,5 @@ public class Ubicacion implements Serializable {
     @JoinColumn(name = "pedido_id_pedido")
     private Pedido pedido;
 
+
 }

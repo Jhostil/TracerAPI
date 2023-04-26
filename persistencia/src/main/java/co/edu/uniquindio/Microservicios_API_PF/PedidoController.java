@@ -5,6 +5,7 @@ import co.edu.uniquindio.Microservicios_API_PF.excepciones.PedidoNotFoundExcepti
 import co.edu.uniquindio.Microservicios_API_PF.servicios.PedidoServicio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,8 @@ public class PedidoController {
 
 
     @GetMapping("{id_pedido}")
-    public ResponseEntity<Pedido> obtenerPedido(@PathVariable String id_pedido, @RequestHeader("Authorization") String authToken){
+    /*public ResponseEntity<Pedido> obtenerPedido(@PathVariable String id_pedido, @RequestHeader("Authorization") String authToken){*/
+    public ResponseEntity<Pedido> obtenerPedido(@PathVariable String id_pedido){
 
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
 
@@ -47,16 +49,15 @@ public class PedidoController {
                     .header("WWW-Authenticate", "Basic realm=\"Restricted Area\"")
                     .entity("Usuario no autorizado para realizar la operación.")
                     .build());
-        }*/
+        }
         //Como verifico que el pedido corresponda a el usuario?
-        /*if(!authorization.substring(7).equals(token)){
+        if(!authorization.substring(7).equals(token)){
             LOGGER.warning("Usuario no posee permisos para realizar la operación.");
             throw new WebApplicationException("Usuario no posee permisos para realizar la operación.", Response.Status.FORBIDDEN);
         }*/
 
         return new ResponseEntity<>(getAndVerify(id_pedido), HttpStatus.OK);
     }
-
     private Pedido getAndVerify(String id_pedido){
         Optional<Pedido> pedido = pedidoServicio.findById_pedido(id_pedido);
         LOGGER.info("Operacion buscando");
@@ -72,7 +73,8 @@ public class PedidoController {
     }
 
     @GetMapping("{id_pedido}/tracer")
-    public ResponseEntity<Pedido> tracer (@PathVariable("id_pedido") String id_pedido, @RequestHeader("Authorization") String authToken)
+    /*public ResponseEntity<Pedido> tracer (@PathVariable("id_pedido") String id_pedido, @RequestHeader("Authorization") String authToken)*/
+    public ResponseEntity<Pedido> tracer (@PathVariable("id_pedido") String id_pedido)
     {
         LOGGER.info("Operacion obteniendo ubicaciones");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");

@@ -1,10 +1,8 @@
 package co.edu.uniquindio.Microservicios_API_PF;
 
-import co.edu.uniquindio.Microservicios_API_PF.entidades.Estado;
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Pedido;
 import co.edu.uniquindio.Microservicios_API_PF.excepciones.PedidoNotFoundException;
 import co.edu.uniquindio.Microservicios_API_PF.servicios.PedidoServicio;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

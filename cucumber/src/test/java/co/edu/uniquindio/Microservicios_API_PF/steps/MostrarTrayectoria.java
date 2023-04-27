@@ -49,7 +49,6 @@ public class MostrarTrayectoria {
         envio = EnvioDTO
                 .builder()
                 .id(id_pedido)
-                .estado("En Reparto")
                 //.fecha_envio(LocalDateTime.of(2023, 1, 16, 12, 30, 0))
                 //.fecha_entrega(LocalDateTime.of(2023, 5, 12, 9, 30, 0))
                 .fecha_envio("2023-03-05T10:30:00")

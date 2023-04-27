@@ -3,11 +3,16 @@ package co.edu.uniquindio.Microservicios_API_PF;
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Pedido;
 import co.edu.uniquindio.Microservicios_API_PF.excepciones.PedidoNotFoundException;
 import co.edu.uniquindio.Microservicios_API_PF.servicios.PedidoServicio;
+import co.edu.uniquindio.Microservicios_API_PF.servicios.TokenServicio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -25,6 +30,8 @@ public class PedidoController {
     }
     @Autowired
     private PedidoServicio pedidoServicio;
+    @Autowired
+    private TokenServicio tokenServicio;
 
 
     @PostMapping
@@ -99,5 +106,32 @@ public class PedidoController {
         return pedido.orElseThrow(() -> new PedidoNotFoundException("Pedido no encontrado."));
     }
 
+    @GetMapping("{id_pedido}/datetime_adjust")
+    public ResponseEntity<String> convertirFechaEntrega(@PathVariable("id_pedido") String idPedido, @RequestHeader("ubicacion_cliente") String zonaHoraria, @RequestHeader("Authorization") String authToken) {
+        System.out.println("Aquí si entré");
+        Objects.requireNonNull(idPedido, "El id del pedido no puede ser nulo");
 
+        if (authToken == null) {
+            LOGGER.warning("Usuario no autorizado para realizar la operación.");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "al parecer usted no está autorizado para acceder a este servicio.");
+        }else if(tokenServicio.validateToken(authToken) == false){
+
+        }
+        // Aquí debes verificar que el pedido corresponda al usuario autenticado.
+
+        System.out.println(idPedido);
+        Optional<Pedido> pedido = pedidoServicio.findById_pedido(idPedido);
+        System.out.println(pedido.get().getId());
+        if (pedido.isPresent()) {
+            String fechaEntrega = pedido.get().getFecha_entrega();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            LocalDateTime localDateTime = LocalDateTime.parse(fechaEntrega, formatter);
+            ZoneId zonaHorariaActual = ZoneId.of("America/New_York");
+            ZoneId zonaHorariaNueva = ZoneId.of(zonaHoraria);
+            LocalDateTime nuevaFechaEntrega = localDateTime.atZone(zonaHorariaActual).withZoneSameInstant(zonaHorariaNueva).toLocalDateTime();
+            return ResponseEntity.ok(nuevaFechaEntrega.toString());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }

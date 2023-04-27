@@ -24,7 +24,7 @@ public class TokenServicioImpl implements TokenServicio{
     private final long expirationTime;
 
     public TokenServicioImpl(TokenRepo tokenRepository,
-                             @Value("jwt.expiration-time") long expirationTime) {
+                             @Value("${jwt.expiration-time}") long expirationTime) {
         this.tokenRepository = tokenRepository;
         this.secretKey = System.getenv("JWT_SECRET");
         this.expirationTime = expirationTime;

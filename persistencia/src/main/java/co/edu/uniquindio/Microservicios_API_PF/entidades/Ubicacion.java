@@ -22,4 +22,5 @@ public class Ubicacion implements Serializable {
     @ManyToOne
     @JoinColumn(name = "pedido_id_pedido")
     private Pedido pedido;
+
 }

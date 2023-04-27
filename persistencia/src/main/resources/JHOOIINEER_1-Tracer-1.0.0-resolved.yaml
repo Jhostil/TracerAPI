@@ -1,0 +1,149 @@
+---
+openapi: 3.0.0
+info:
+  title: Tracer
+  description: API que permite gestionar el servicio de rastreo de los paquetes de los usuarios de la tienda virtual
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: SwaggerHub API Auto Mocking
+security:
+- application:
+  - read
+  - write
+paths:
+  /pedidos/{id_pedido}/estado:
+    patch:
+      summary: Permite asignar estado a un pedido
+      description: This is an example operation to show how security is applied to the call.
+      parameters:
+      - name: id_pedido
+        in: path
+        description: ID del pedido a actualizar
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/id_pedido_estado_body'
+        required: true
+      responses:
+        "200":
+          description: OK
+  /pedidos/{id_pedido}/tracer:
+    get:
+      summary: Permite rastrear de un pedido dado su ID
+      description: Esta operación permite obtener los atributos relacionados a un pedido dado su identificador
+      parameters:
+      - name: id
+        in: path
+        description: ID del pedido a buscar
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+  /pedidos/{id_pedido}:
+    get:
+      summary: Permite buscar un pedido dado su ID
+      description: This is an example operation to show how security is applied to the call.
+      parameters:
+      - name: id
+        in: path
+        description: ID del pedido a buscar
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: Token de autorización del usuario
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+  /pedidos/{id_pedido}/time:
+    get:
+      summary: Permite obtener la fecha estimada de entrega de un pedido
+      description: This is an example operation to show how security is applied to the call.
+      parameters:
+      - name: id_pedido
+        in: path
+        description: ID del pedido
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /pedidos/{id_pedido}/transportadoras:
+    get:
+      summary: Permite obtener la información de la transportadora encargada de entregar el pedido
+      description: This is an example operation to show how security is applied to the call.
+      parameters:
+      - name: id_pedido
+        in: path
+        description: ID del pedido a consultar
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /pedidos/{id_pedido}/datetime_adjust:
+    get:
+      summary: Permite ajustar la zona horaria
+      description: This is an example operation to show how security is applied to the call.
+      parameters:
+      - name: id_pedido
+        in: path
+        description: ID del pedido al cual se le ajustará la zona horaria
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    Pedido:
+      type: object
+      properties:
+        id_pedido:
+          type: string
+        estado_envio:
+          type: object
+        fecha_envio:
+          type: string
+        fecha_entrega:
+          type: string
+    id_pedido_estado_body:
+      type: object
+      properties:
+        estado_envio:
+          type: string
+          example: entregado

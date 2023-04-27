@@ -16,7 +16,7 @@ public class EnvioDTO implements Serializable {
 
     private final String id;
 
-    private final String estado;
+    private final List<EstadoDTO> estado;
 
     //   private final LocalDateTime fecha_envio;
     private final String fecha_envio;

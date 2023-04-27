@@ -66,19 +66,27 @@ public class PedidoController {
     }
 
     @PatchMapping("{id_pedido}")
-    private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestHeader("Authorization") String authToken, @RequestBody Estado esatdo) {
+    private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestHeader("Authorization") String authToken, @RequestBody Estado estado) {
         LOGGER.info("Operacion agregando nuevo estado");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
         try {
             Pedido pd = getAndVerify(id_pedido);
-            pd.getEstado().add(esatdo);
+            pd.getEstado().add(estado);
+            estado.setId(id_pedido);
+            estado.setPedido(pd);
+            guardarEstado(estado);
             pedidoServicio.save(pd);
             return ResponseEntity.status(HttpStatus.OK).build();
         }catch (PedidoNotFoundException pe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pe.getMessage());
         }catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
         }
+    }
+
+    private void guardarEstado(Estado estado) {
+        pedidoServicio.saveEstado(estado);
     }
     @GetMapping("{id_pedido}/time")
     private ResponseEntity<String> estimarFechaEntrega(@PathVariable String id_pedido) {

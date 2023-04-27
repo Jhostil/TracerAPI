@@ -1,8 +1,10 @@
 package co.edu.uniquindio.Microservicios_API_PF;
 
+import co.edu.uniquindio.Microservicios_API_PF.entidades.Estado;
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Pedido;
 import co.edu.uniquindio.Microservicios_API_PF.excepciones.PedidoNotFoundException;
 import co.edu.uniquindio.Microservicios_API_PF.servicios.PedidoServicio;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +57,22 @@ public class PedidoController {
         }*/
 
         return new ResponseEntity<>(getAndVerify(id_pedido), HttpStatus.OK);
+    }
+
+    @PatchMapping("{id_pedido}")
+    private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestHeader("Authorization") String authToken, @RequestBody Estado esatdo) {
+        LOGGER.info("Operacion agregando nuevo estado");
+        Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
+        try {
+            Pedido pd = getAndVerify(id_pedido);
+            pd.getEstado().add(esatdo);
+            pedidoServicio.save(pd);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }catch (PedidoNotFoundException pe) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pe.getMessage());
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
+        }
     }
 
     private Pedido getAndVerify(String id_pedido){

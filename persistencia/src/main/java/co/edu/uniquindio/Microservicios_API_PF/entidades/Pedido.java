@@ -19,7 +19,8 @@ public class Pedido implements Serializable {
     private String id;
 
     @JsonProperty("estado")
-    private String estado;
+    @OneToMany(mappedBy = "pedido")
+    private List<Estado> estado;
 
     @JsonProperty("fecha_envio")
     //private LocalDateTime fecha_envio;

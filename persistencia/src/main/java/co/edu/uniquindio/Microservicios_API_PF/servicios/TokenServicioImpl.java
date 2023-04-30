@@ -1,41 +1,40 @@
 package co.edu.uniquindio.Microservicios_API_PF.servicios;
-import co.edu.uniquindio.Microservicios_API_PF.entidades.Pedido;
+
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Token;
 import co.edu.uniquindio.Microservicios_API_PF.repositorios.TokenRepo;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import java.security.NoSuchAlgorithmException;
+import javax.crypto.SecretKey;
 
 import javax.persistence.TransactionRequiredException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
-
-
 @Service
-public class TokenServicioImpl implements TokenServicio{
+public class TokenServicioImpl implements TokenServicio {
 
     private final TokenRepo tokenRepository;
-    private final String secretKey;
-    private final long expirationTime;
+    private final SecretKey secretKey;
 
-    public TokenServicioImpl(TokenRepo tokenRepository,
-                             @Value("${jwt.expiration-time}") long expirationTime) {
+    public TokenServicioImpl(TokenRepo tokenRepository) throws NoSuchAlgorithmException {
+        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         this.tokenRepository = tokenRepository;
-        this.secretKey = System.getenv("JWT_SECRET");
-        this.expirationTime = expirationTime;
     }
 
     public String generateToken(String subject) {
-        LocalDateTime expirationDate = LocalDateTime.now().plusSeconds(expirationTime);
+        LocalDateTime expirationDate = LocalDateTime.now().plusSeconds(3600000);
         String tokenString = Jwts.builder()
                 .setSubject(subject)
                 .setExpiration(Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant()))
-                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                .signWith(secretKey)
                 .compact();
 
         Token token = new Token();
@@ -50,11 +49,14 @@ public class TokenServicioImpl implements TokenServicio{
         Optional<Token> optionalToken = tokenRepository.findByTokenString(tokenString);
         if (optionalToken.isPresent()) {
             Token token = optionalToken.get();
-            if (token.getExpirationDate().isAfter(LocalDateTime.now())) {
-                return true;
-            } else {
-                tokenRepository.delete(token);
-            }
+            LocalDateTime expirationDate = token.getExpirationDate();
+            Instant expirationInstant = expirationDate.atZone(ZoneId.systemDefault()).toInstant();
+            Instant currentInstant = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
+                if (expirationInstant.isAfter(currentInstant)) {
+                    return true;
+                } else {
+                    tokenRepository.delete(token);
+                }
         }
         return false;
     }
@@ -68,24 +70,11 @@ public class TokenServicioImpl implements TokenServicio{
                     .parseClaimsJws(token)
                     .getBody();
             subject = claims.getSubject();
-        }catch (JwtException e){
+        } catch (Exception e) {
             // en caso de que el token no sea válido
-            throw new JwtException("Token inválido: " + e.getMessage());
+            throw new RuntimeException("Token inválido: " + e.getMessage() +"el token que ha llegado es:" + token);
         }
         return subject;
-    }
-
-    public Optional<Token> findByTokenString(String tokenString) {
-        return tokenRepository.findByTokenString(tokenString);
-    }
-
-    public void save(Token token) {
-        try {
-            tokenRepository.save(token); // intentamos guardar el pedido en la base de datos
-        } catch (TransactionRequiredException e) {
-            // si ocurre una excepción de tipo TransactionRequiredException, la relanzamos como RuntimeException
-            throw new RuntimeException(e);
-        }
     }
 
 }

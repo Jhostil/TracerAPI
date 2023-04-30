@@ -31,14 +31,14 @@ public class TransformarFecha {
                 //.fecha_envio(LocalDateTime.of(2023, 1, 16, 12, 30, 0))
                 //.fecha_entrega(LocalDateTime.of(2023, 5, 12, 9, 30, 0))
                 .fecha_envio("2023-03-05T10:30:00")
-                .fecha_entrega("2023-04-20T16:30:00")
+                .fecha_entrega("27/04/2023 15:00")
                 .build();
 
         //Guardo el envio
         given()
                 .contentType(ContentType.JSON)
                 .body(envio)
-                .post("http://localhost:8080/api/pedidos");
+                .post("http://localhost:8080/pedidos");
 
         this.idPedido = id_pedido;
     }
@@ -46,11 +46,11 @@ public class TransformarFecha {
     @When("el usuario convierte la fecha de entrega a la zona horaria de {string}")
     public void elUsuarioConvierteLaFechaDeEntregaALaZonaHorariaDe(String zonaHoraria) {
 
-        Response response = RestAssured.given()
+        response = RestAssured.given()
                 .header("ubicacion_cliente", zonaHoraria)
                 .header("Authorization", "Bearer " + "authToken") // Aquí debes establecer el token de autenticación.
                 .when()
-                .get("http://localhost:8080/api/pedidos/12357/datetime_adjust"); // Aquí debes establecer el id del pedido.
+                .get("http://localhost:8080/pedidos/12357/datetime_adjust"); // Aquí debes establecer el id del pedido.
 
         nuevaFechaEntrega = response.getBody().asString();
         System.out.println(nuevaFechaEntrega);
@@ -58,7 +58,7 @@ public class TransformarFecha {
 
     @Then("el usuario obtiene la nueva fecha de entrega {string}")
     public void elUsuarioObtieneLaNuevaFechaDeEntregaSegúnLaZonaHorariaDeBogota(String nuevaFecha) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy'T'HH:mm");
         LocalDateTime expectedDateTime = LocalDateTime.parse(nuevaFecha, formatter);
         LocalDateTime actualDateTime = LocalDateTime.parse(nuevaFechaEntrega, formatter);
 

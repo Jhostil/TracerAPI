@@ -109,30 +109,28 @@ public class PedidoController {
     }
 
     @GetMapping("{id_pedido}/datetime_adjust")
-    public ResponseEntity<String> convertirFechaEntrega(@PathVariable("id_pedido") String idPedido, @RequestHeader("ubicacion_cliente") String zonaHoraria, @RequestHeader("Authorization") String authToken) {
+    public ResponseEntity<String> convertirFechaEntrega(@PathVariable("id_pedido") String idPedido, @RequestHeader("ubicacion_cliente") String zonaHoraria) {
         System.out.println("Aquí si entré");
         Objects.requireNonNull(idPedido, "El id del pedido no puede ser nulo");
 
-        if (authToken == null) {
-            LOGGER.warning("Usuario no autorizado para realizar la operación.");
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "al parecer usted no está autorizado para acceder a este servicio.");
-        }else if(tokenServicio.validateToken(authToken) == false){
-
-        }
         // Aquí debes verificar que el pedido corresponda al usuario autenticado.
 
         System.out.println(idPedido);
         Optional<Pedido> pedido = pedidoServicio.findById_pedido(idPedido);
         System.out.println(pedido.get().getId());
         if (pedido.isPresent()) {
+            System.out.println("if");
             String fechaEntrega = pedido.get().getFecha_entrega();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            System.out.println(fechaEntrega);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             LocalDateTime localDateTime = LocalDateTime.parse(fechaEntrega, formatter);
+            System.out.println(localDateTime);
             ZoneId zonaHorariaActual = ZoneId.of("America/New_York");
             ZoneId zonaHorariaNueva = ZoneId.of(zonaHoraria);
             LocalDateTime nuevaFechaEntrega = localDateTime.atZone(zonaHorariaActual).withZoneSameInstant(zonaHorariaNueva).toLocalDateTime();
             return ResponseEntity.ok(nuevaFechaEntrega.toString());
         } else {
+            System.out.println("else");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

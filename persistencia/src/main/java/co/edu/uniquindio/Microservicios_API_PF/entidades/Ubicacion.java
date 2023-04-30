@@ -7,7 +7,6 @@ import lombok.Data;
 import javax.persistence.*;
 import java.io.Serializable;
 
-
 @Data
 @Entity
 public class Ubicacion implements Serializable {
@@ -23,6 +22,5 @@ public class Ubicacion implements Serializable {
     @ManyToOne
     @JoinColumn(name = "pedido_id_pedido")
     private Pedido pedido;
-
 
 }

@@ -1,19 +1,20 @@
 package co.edu.uniquindio.Microservicios_API_PF;
 
+import co.edu.uniquindio.Microservicios_API_PF.entidades.Estado;
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Pedido;
 import co.edu.uniquindio.Microservicios_API_PF.excepciones.PedidoNotFoundException;
 import co.edu.uniquindio.Microservicios_API_PF.servicios.PedidoServicio;
 import co.edu.uniquindio.Microservicios_API_PF.servicios.TokenServicio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.OffsetDateTime;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -44,8 +45,7 @@ public class PedidoController {
 
 
     @GetMapping("{id_pedido}")
-    /*public ResponseEntity<Pedido> obtenerPedido(@PathVariable String id_pedido, @RequestHeader("Authorization") String authToken){*/
-    public ResponseEntity<Pedido> obtenerPedido(@PathVariable String id_pedido){
+    public ResponseEntity<Pedido> obtenerPedido(@PathVariable String id_pedido, @RequestHeader("Authorization") String authToken){
 
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
 
@@ -56,15 +56,52 @@ public class PedidoController {
                     .header("WWW-Authenticate", "Basic realm=\"Restricted Area\"")
                     .entity("Usuario no autorizado para realizar la operación.")
                     .build());
-        }
+        }*/
         //Como verifico que el pedido corresponda a el usuario?
-        if(!authorization.substring(7).equals(token)){
+        /*if(!authorization.substring(7).equals(token)){
             LOGGER.warning("Usuario no posee permisos para realizar la operación.");
             throw new WebApplicationException("Usuario no posee permisos para realizar la operación.", Response.Status.FORBIDDEN);
         }*/
 
         return new ResponseEntity<>(getAndVerify(id_pedido), HttpStatus.OK);
     }
+
+    @PatchMapping("{id_pedido}")
+    private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestHeader("Authorization") String authToken, @RequestBody Estado esatdo) {
+        LOGGER.info("Operacion agregando nuevo estado");
+        Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
+        try {
+            Pedido pd = getAndVerify(id_pedido);
+            pd.getEstado().add(esatdo);
+            pedidoServicio.save(pd);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }catch (PedidoNotFoundException pe) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pe.getMessage());
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
+        }
+    }
+    @GetMapping("{id_pedido}/time")
+    private ResponseEntity<String> estimarFechaEntrega(@PathVariable String id_pedido) {
+        LOGGER.info("Operacion estima fecha de entrega de un producto");
+        Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
+        try {
+            Pedido pd = getAndVerify(id_pedido);
+
+            //Ejemplo de como se debe manejar la fecha "Fri, 07 Aug 2020 18:00:00 +0000";
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
+            OffsetDateTime parsedDate = OffsetDateTime.parse(pd.getFecha_envio(), formatter);
+            parsedDate = parsedDate.plusDays(10L);
+            pd.setFecha_entrega(parsedDate.toString());
+            pedidoServicio.save(pd);
+            return new ResponseEntity<>(parsedDate.toString(),HttpStatus.OK);
+        }catch (PedidoNotFoundException pe) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pe.getMessage());
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
+        }
+    }
+
     private Pedido getAndVerify(String id_pedido){
         Optional<Pedido> pedido = pedidoServicio.findById_pedido(id_pedido);
         LOGGER.info("Operacion buscando");
@@ -80,8 +117,7 @@ public class PedidoController {
     }
 
     @GetMapping("{id_pedido}/tracer")
-    /*public ResponseEntity<Pedido> tracer (@PathVariable("id_pedido") String id_pedido, @RequestHeader("Authorization") String authToken)*/
-    public ResponseEntity<Pedido> tracer (@PathVariable("id_pedido") String id_pedido)
+    public ResponseEntity<Pedido> tracer (@PathVariable("id_pedido") String id_pedido, @RequestHeader("Authorization") String authToken)
     {
         LOGGER.info("Operacion obteniendo ubicaciones");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");

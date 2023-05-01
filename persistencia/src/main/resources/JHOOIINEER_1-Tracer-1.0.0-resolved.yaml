@@ -133,17 +133,21 @@ components:
     Pedido:
       type: object
       properties:
-        id_pedido:
+        id:
           type: string
         estado_envio:
-          type: object
+          type: array
         fecha_envio:
-          type: string
-        fecha_entrega:
           type: string
     id_pedido_estado_body:
       type: object
       properties:
-        estado_envio:
+        id:
           type: string
-          example: entregado
+        detalle:
+          type: string
+        descripcion:
+          type: object
+          properties:
+            descripcion:
+              type: string

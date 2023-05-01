@@ -51,7 +51,7 @@ public class PedidoController {
         return new ResponseEntity<>(getAndVerify(id_pedido), HttpStatus.OK);
     }
 
-    @PatchMapping("{id_pedido}")
+    @PatchMapping("{id_pedido}/estado")
     private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestBody Estado estado) {
         LOGGER.info("Operacion agregando nuevo estado");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");

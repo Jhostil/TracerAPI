@@ -27,4 +27,6 @@ public class EnvioDTO implements Serializable {
 
     private final List<UbicacionDTO> ubicaciones;
 
+    private final TransportadoraDTO transportadora;
+
 }

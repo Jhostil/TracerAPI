@@ -40,18 +40,25 @@ public class MostrarTrayectoria {
     public void hayUnPedidoConElIdentificador(String id_pedido) {
         List<UbicacionDTO> ubicaciones = new ArrayList<>();
 
-        ubicacion = new UbicacionDTO(-23.098738, 12.462098);
+        ubicacion = UbicacionDTO
+                .builder()
+                .latitud(-23.098738)
+                .longitud(12.462098)
+                .build();
+
         ubicaciones.add(ubicacion);
 
-        ubicacion = new UbicacionDTO(-70.109284, -15.633680);
+        //ubicacion = new UbicacionDTO(-70.109284,-15.633680);
+        ubicacion = UbicacionDTO
+                .builder()
+                .latitud(-70.109284)
+                .longitud(-15.633680)
+                .build();
         ubicaciones.add(ubicacion);
 
         envio = EnvioDTO
                 .builder()
-                .id(id_pedido)
-                //.fecha_envio(LocalDateTime.of(2023, 1, 16, 12, 30, 0))
-                //.fecha_entrega(LocalDateTime.of(2023, 5, 12, 9, 30, 0))
-                .fecha_envio("2023-03-05T10:30:00")
+                .id(id_pedido).fecha_envio("2023-03-05T10:30:00")
                 .fecha_entrega("2023-04-14T09:00:00")
                 .ubicaciones(ubicaciones)
                 .build();
@@ -64,8 +71,6 @@ public class MostrarTrayectoria {
                 .header("Authorization", "Bearer miToken")
                 .body(envio)
                 .post("http://localhost:8080/pedidos");
-
-        System.out.println("Se guardó exitosamente");
 
         response = given()
                 .contentType(ContentType.JSON)

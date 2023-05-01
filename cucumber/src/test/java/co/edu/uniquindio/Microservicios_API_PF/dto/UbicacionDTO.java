@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Getter
 @Builder
-@RequiredArgsConstructor(onConstructor_={@ConstructorProperties({"id_pedido", "estado", "fecha_envio", "fecha_entrega"})} )
+@RequiredArgsConstructor(onConstructor_={@ConstructorProperties({"latitud", "longitud"})} )
 public class UbicacionDTO implements Serializable {
 
     private final double latitud;

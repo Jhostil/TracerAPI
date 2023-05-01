@@ -2,9 +2,13 @@ package co.edu.uniquindio.Microservicios_API_PF;
 
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Estado;
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Pedido;
+import co.edu.uniquindio.Microservicios_API_PF.entidades.Transportadora;
+import co.edu.uniquindio.Microservicios_API_PF.entidades.Ubicacion;
 import co.edu.uniquindio.Microservicios_API_PF.excepciones.PedidoNotFoundException;
 import co.edu.uniquindio.Microservicios_API_PF.servicios.PedidoServicio;
 import co.edu.uniquindio.Microservicios_API_PF.servicios.TokenServicio;
+import co.edu.uniquindio.Microservicios_API_PF.servicios.TransportadoraServicio;
+import co.edu.uniquindio.Microservicios_API_PF.servicios.UbicacionServicio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,23 +31,35 @@ public class PedidoController {
 
     private static final Logger LOGGER = Logger.getLogger(PedidoController.class.getName());
 
-    @RequestMapping(value = "/endpoint", method = RequestMethod.GET)
-    public String getDemo() {
-        return "Hello world!";
-    }
     @Autowired
     private PedidoServicio pedidoServicio;
     @Autowired
     private TokenServicio tokenServicio;
+    @Autowired
+    private TransportadoraServicio transportadoraServicio;
+
+    @Autowired
+    private UbicacionServicio ubicacionServicio;
 
 
     @PostMapping
     public void create (@RequestBody Pedido pedido)
     {
         pedidoServicio.save(pedido);
+
+        if (!pedido.getUbicaciones().isEmpty())
+        {
+            guardarUbicaciones (pedido);
+        }
     }
 
-
+    public void guardarUbicaciones (Pedido pedido)
+    {
+        for (Ubicacion ubicacion: pedido.getUbicaciones()) {
+            ubicacion.setPedido(pedido);
+            ubicacionServicio.save(ubicacion);
+        }
+    }
 
     @GetMapping("{id_pedido}")
     public ResponseEntity<Pedido> obtenerPedido(@PathVariable String id_pedido){
@@ -126,28 +143,36 @@ public class PedidoController {
 
     @GetMapping("{id_pedido}/datetime_adjust")
     public ResponseEntity<String> convertirFechaEntrega(@PathVariable("id_pedido") String idPedido, @RequestHeader("ubicacion_cliente") String zonaHoraria) {
-        System.out.println("Aquí si entré");
         Objects.requireNonNull(idPedido, "El id del pedido no puede ser nulo");
 
-        // Aquí debes verificar que el pedido corresponda al usuario autenticado.
-
-        System.out.println(idPedido);
         Optional<Pedido> pedido = pedidoServicio.findById_pedido(idPedido);
-        System.out.println(pedido.get().getId());
         if (pedido.isPresent()) {
-            System.out.println("if");
             String fechaEntrega = pedido.get().getFecha_entrega();
-            System.out.println(fechaEntrega);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             LocalDateTime localDateTime = LocalDateTime.parse(fechaEntrega, formatter);
-            System.out.println(localDateTime);
             ZoneId zonaHorariaActual = ZoneId.of("America/New_York");
             ZoneId zonaHorariaNueva = ZoneId.of(zonaHoraria);
             LocalDateTime nuevaFechaEntrega = localDateTime.atZone(zonaHorariaActual).withZoneSameInstant(zonaHorariaNueva).toLocalDateTime();
             return ResponseEntity.ok(nuevaFechaEntrega.toString());
         } else {
-            System.out.println("else");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("{id_pedido}/transportadoras")
+    public ResponseEntity<?> obtenerTransportadora (@PathVariable("id_pedido") String id_pedido)
+    {
+        LOGGER.info("Operacion obtener información de la transportadora");
+        Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
+        try {
+
+            Pedido pd = getAndVerify(id_pedido);
+
+            return new ResponseEntity<>(pd,HttpStatus.OK);
+        } catch (PedidoNotFoundException pe) {
+            return new ResponseEntity<>(getRoute(id_pedido), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Hubo un error, por favor intente de nuevo",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

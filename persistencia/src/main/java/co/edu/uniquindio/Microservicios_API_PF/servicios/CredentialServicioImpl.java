@@ -2,7 +2,6 @@ package co.edu.uniquindio.Microservicios_API_PF.servicios;
 
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Credential;

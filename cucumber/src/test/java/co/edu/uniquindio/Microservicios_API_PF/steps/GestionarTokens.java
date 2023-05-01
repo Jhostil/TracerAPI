@@ -1,6 +1,8 @@
 package co.edu.uniquindio.Microservicios_API_PF.steps;
 
-import co.edu.uniquindio.Microservicios_API_PF.dto.EnvioDTO;
+import co.edu.uniquindio.Microservicios_API_PF.dto.CredentialDTO;
+import co.edu.uniquindio.Microservicios_API_PF.dto.RolDTO;
+import co.edu.uniquindio.Microservicios_API_PF.dto.UserWithCredentialsDTO;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -44,19 +46,32 @@ public class GestionarTokens {
     }
 
     @Given("que tengo un token de autenticación válido")
-    public void que_tengo_un_token_de_autenticacion_valido() {
-        EnvioDTO envio = EnvioDTO
+    public void que_tengo_un_token_de_autenticacion_valido(){
+
+        CredentialDTO credential = CredentialDTO
                 .builder()
-                .id("")
-                .estado("En Reparto")
-                .fecha_envio("2023-03-05T10:30:00")
-                .fecha_entrega("2023-04-14T09:00:00")
+                .id("0")
+                .username("Jaime123")
+                .password("12345678")
+                .rol(RolDTO.USUARIO)
                 .build();
+        UserWithCredentialsDTO user = UserWithCredentialsDTO
+                .builder()
+                .id("1")
+                .correo("jaimito@gmail.com")
+                .nombre("Jaime")
+                .apellido("vergara")
+                .credential(credential)
+                .build();
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("http://localhost:8080/usuarios");
 
         response = RestAssured.given()
                 .contentType(ContentType.JSON)
-                .queryParam("subject", subject)
-                .body(envio)
+                .queryParam("subject", user.getCredential().getUsername())
                 .post("http://localhost:8080/tokens/generacion");
 
         token = response.getBody().asString(); // agregar esta línea para almacenar el nuevo token
@@ -64,6 +79,7 @@ public class GestionarTokens {
         response = RestAssured.given()
                 .contentType(ContentType.JSON)
                 .queryParam("tokenString", token)
+                .body(user)
                 .get("http://localhost:8080/tokens/validacion");
     }
 

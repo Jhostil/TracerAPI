@@ -1,5 +1,6 @@
 package co.edu.uniquindio.Microservicios_API_PF;
 
+import co.edu.uniquindio.Microservicios_API_PF.entidades.Usuario;
 import co.edu.uniquindio.Microservicios_API_PF.servicios.TokenServicio;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,8 @@ public class TokenController {
     }
 
     @GetMapping("/validacion")
-    public ResponseEntity<Boolean> validateToken(@RequestParam String tokenString) {
-        boolean isValid = tokenService.validateToken(tokenString);
+    public ResponseEntity<Boolean> validateToken(@RequestParam String tokenString, @RequestBody Usuario usuario) {
+        boolean isValid = tokenService.validateToken(tokenString, usuario);
         return ResponseEntity.ok(isValid);
     }
 

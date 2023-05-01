@@ -19,7 +19,6 @@ public class TransformarFecha {
 
     private EnvioDTO envio;
     private String nuevaFechaEntrega = "2023-04-20 16:30:00";
-    private String idPedido;
     private Response response;
 
     @Given("que el usuario tiene un pedido con el id {string}")
@@ -27,11 +26,11 @@ public class TransformarFecha {
         envio = EnvioDTO
                 .builder()
                 .id(id_pedido)
-                .estado("En Reparto")
+//                .estado("En Reparto")
                 //.fecha_envio(LocalDateTime.of(2023, 1, 16, 12, 30, 0))
                 //.fecha_entrega(LocalDateTime.of(2023, 5, 12, 9, 30, 0))
                 .fecha_envio("2023-03-05T10:30:00")
-                .fecha_entrega("27/04/2023 15:00")
+                .fecha_entrega("27/04/2023 16:00")
                 .build();
 
         //Guardo el envio
@@ -40,15 +39,14 @@ public class TransformarFecha {
                 .body(envio)
                 .post("http://localhost:8080/pedidos");
 
-        this.idPedido = id_pedido;
     }
 
     @When("el usuario convierte la fecha de entrega a la zona horaria de {string}")
     public void elUsuarioConvierteLaFechaDeEntregaALaZonaHorariaDe(String zonaHoraria) {
 
         response = RestAssured.given()
-                .header("ubicacion_cliente", zonaHoraria)
-                .header("Authorization", "Bearer " + "authToken") // Aquí debes establecer el token de autenticación.
+                .queryParam("zona_horaria", zonaHoraria)
+    //            .header("Authorization", "Bearer " + "authToken") // Aquí debes establecer el token de autenticación.
                 .when()
                 .get("http://localhost:8080/pedidos/12357/datetime_adjust"); // Aquí debes establecer el id del pedido.
 
@@ -57,8 +55,8 @@ public class TransformarFecha {
     }
 
     @Then("el usuario obtiene la nueva fecha de entrega {string}")
-    public void elUsuarioObtieneLaNuevaFechaDeEntregaSegúnLaZonaHorariaDeBogota(String nuevaFecha) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy'T'HH:mm");
+    public void elUsuarioObtieneLaNuevaFechaDeEntregaSegunLaZonaHorariaDeBogota(String nuevaFecha) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         LocalDateTime expectedDateTime = LocalDateTime.parse(nuevaFecha, formatter);
         LocalDateTime actualDateTime = LocalDateTime.parse(nuevaFechaEntrega, formatter);
 
@@ -66,7 +64,8 @@ public class TransformarFecha {
 
         response = given()
                 .contentType(ContentType.JSON)
-                .header("Authorization", "Bearer miToken")
+  //              .header("Authorization", "Bearer miToken")
+                .queryParam("zona_horaria", "America/Bogota")
                 .get("http://localhost:8080/pedidos/" + envio.getId() + "/datetime_adjust");
     }
 

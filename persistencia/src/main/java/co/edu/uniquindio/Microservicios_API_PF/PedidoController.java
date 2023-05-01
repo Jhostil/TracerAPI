@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.OffsetDateTime;
 import java.util.Locale;
@@ -145,7 +146,7 @@ public class PedidoController {
     }
 
     @GetMapping("{id_pedido}/datetime_adjust")
-    public ResponseEntity<String> convertirFechaEntrega(@PathVariable("id_pedido") String idPedido, @PathVariable("zona_horaria") String zonaHoraria) {
+    public ResponseEntity<String> convertirFechaEntrega(@PathVariable("id_pedido") String idPedido, @RequestParam("zona_horaria") String zonaHoraria) {
         Objects.requireNonNull(idPedido, "El id del pedido no puede ser nulo");
 
 
@@ -159,10 +160,14 @@ public class PedidoController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             LocalDateTime localDateTime = LocalDateTime.parse(fechaEntrega, formatter);
             System.out.println(localDateTime);
-            ZoneId zonaHorariaActual = ZoneId.of("America/New_York");
+            ZoneId zonaHorariaOriginal = ZoneId.of("America/New_York");
             ZoneId zonaHorariaNueva = ZoneId.of(zonaHoraria);
-            LocalDateTime nuevaFechaEntrega = localDateTime.atZone(zonaHorariaActual).withZoneSameInstant(zonaHorariaNueva).toLocalDateTime();
-            return ResponseEntity.ok(nuevaFechaEntrega.toString());
+            ZonedDateTime zonedDateTimeOriginal = localDateTime.atZone(zonaHorariaOriginal);
+            ZonedDateTime zonedDateTimeNueva = zonedDateTimeOriginal.withZoneSameInstant(zonaHorariaNueva);
+            LocalDateTime nuevaFechaEntrega = zonedDateTimeNueva.toLocalDateTime();
+            String fechaFormateada = nuevaFechaEntrega.format(formatter);
+            System.out.println(nuevaFechaEntrega);
+            return ResponseEntity.ok(fechaFormateada);
         } else {
             System.out.println("else");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

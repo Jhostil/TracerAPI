@@ -39,7 +39,7 @@ public class AgregarEstado {
         envio = EnvioDTO
                 .builder()
                 .id(id_pedido)
-                .estado("En Reparto")
+                .estado(null)
                 .fecha_envio("2023-03-05T10:30:00")
                 .fecha_entrega("2023-04-14T09:00:00")
                 .build();

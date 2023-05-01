@@ -45,7 +45,7 @@ public class PedidoController {
 
 
     @GetMapping("{id_pedido}")
-    public ResponseEntity<Pedido> obtenerPedido(@PathVariable String id_pedido, @RequestHeader("Authorization") String authToken){
+    public ResponseEntity<Pedido> obtenerPedido(@PathVariable String id_pedido){
 
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
 
@@ -67,7 +67,7 @@ public class PedidoController {
     }
 
     @PatchMapping("{id_pedido}")
-    private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestHeader("Authorization") String authToken, @RequestBody Estado esatdo) {
+    private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestBody Estado esatdo) {
         LOGGER.info("Operacion agregando nuevo estado");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
         try {
@@ -117,7 +117,7 @@ public class PedidoController {
     }
 
     @GetMapping("{id_pedido}/tracer")
-    public ResponseEntity<Pedido> tracer (@PathVariable("id_pedido") String id_pedido, @RequestHeader("Authorization") String authToken)
+    public ResponseEntity<Pedido> tracer (@PathVariable("id_pedido") String id_pedido)
     {
         LOGGER.info("Operacion obteniendo ubicaciones");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
@@ -145,11 +145,9 @@ public class PedidoController {
     }
 
     @GetMapping("{id_pedido}/datetime_adjust")
-    public ResponseEntity<String> convertirFechaEntrega(@PathVariable("id_pedido") String idPedido, @RequestHeader("ubicacion_cliente") String zonaHoraria) {
-        System.out.println("Aquí si entré");
+    public ResponseEntity<String> convertirFechaEntrega(@PathVariable("id_pedido") String idPedido, @PathVariable("zona_horaria") String zonaHoraria) {
         Objects.requireNonNull(idPedido, "El id del pedido no puede ser nulo");
 
-        // Aquí debes verificar que el pedido corresponda al usuario autenticado.
 
         System.out.println(idPedido);
         Optional<Pedido> pedido = pedidoServicio.findById_pedido(idPedido);

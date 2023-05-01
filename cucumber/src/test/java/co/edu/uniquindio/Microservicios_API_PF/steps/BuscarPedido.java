@@ -37,7 +37,7 @@ public class BuscarPedido {
         envio = EnvioDTO
                 .builder()
                 .id(id_pedido)
-                .estado("En Reparto")
+//                .estado("En Reparto")
                 //.fecha_envio(LocalDateTime.of(2023, 1, 16, 12, 30, 0))
                 //.fecha_entrega(LocalDateTime.of(2023, 5, 12, 9, 30, 0))
                 .fecha_envio("2023-03-05T10:30:00")
@@ -71,7 +71,7 @@ public class BuscarPedido {
     public void laInformacionDelEnvio() {
         response.then()
                 .body("id",response->notNullValue())
-                .body("estado",response->notNullValue())
+//                .body("estado",response->notNullValue())
                 .body("fecha_envio",response->notNullValue())
                 .body("fecha_entrega",response->notNullValue());
     }

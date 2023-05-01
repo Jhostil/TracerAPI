@@ -67,12 +67,6 @@ paths:
         explode: false
         schema:
           type: string
-      - name: Authorization
-        in: header
-        description: Token de autorización del usuario
-        required: true
-        schema:
-          type: string
       responses:
         "200":
           description: OK

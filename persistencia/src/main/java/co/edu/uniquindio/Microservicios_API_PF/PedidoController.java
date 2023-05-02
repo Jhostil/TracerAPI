@@ -10,14 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.sql.Time;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.OffsetDateTime;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
 
 @RestController
@@ -50,37 +46,31 @@ public class PedidoController {
 
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
 
-        /* if (authToken == null)
-        {
-            LOGGER.warning("Usuario no autorizado para realizar la operación.");
-            throw new WebApplicationException("Debe iniciar sesión para realizar la acción.", Response.status(Response.Status.UNAUTHORIZED)
-                    .header("WWW-Authenticate", "Basic realm=\"Restricted Area\"")
-                    .entity("Usuario no autorizado para realizar la operación.")
-                    .build());
-        }*/
-        //Como verifico que el pedido corresponda a el usuario?
-        /*if(!authorization.substring(7).equals(token)){
-            LOGGER.warning("Usuario no posee permisos para realizar la operación.");
-            throw new WebApplicationException("Usuario no posee permisos para realizar la operación.", Response.Status.FORBIDDEN);
-        }*/
-
         return new ResponseEntity<>(getAndVerify(id_pedido), HttpStatus.OK);
     }
 
-    @PatchMapping("{id_pedido}")
-    private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestBody Estado esatdo) {
+    @PatchMapping("{id_pedido}/estado")
+    private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestBody Estado estado) {
         LOGGER.info("Operacion agregando nuevo estado");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
         try {
             Pedido pd = getAndVerify(id_pedido);
-            pd.getEstado().add(esatdo);
+            pd.getEstado().add(estado);
+            estado.setId(id_pedido);
+            estado.setPedido(pd);
+            guardarEstado(estado);
             pedidoServicio.save(pd);
             return ResponseEntity.status(HttpStatus.OK).build();
         }catch (PedidoNotFoundException pe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pe.getMessage());
         }catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
         }
+    }
+
+    private void guardarEstado(Estado estado) {
+        pedidoServicio.saveEstado(estado);
     }
     @GetMapping("{id_pedido}/time")
     private ResponseEntity<String> estimarFechaEntrega(@PathVariable String id_pedido) {
@@ -88,18 +78,21 @@ public class PedidoController {
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
         try {
             Pedido pd = getAndVerify(id_pedido);
+            pd.setId(id_pedido);
 
-            //Ejemplo de como se debe manejar la fecha "Fri, 07 Aug 2020 18:00:00 +0000";
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
-            OffsetDateTime parsedDate = OffsetDateTime.parse(pd.getFecha_envio(), formatter);
-            parsedDate = parsedDate.plusDays(10L);
-            pd.setFecha_entrega(parsedDate.toString());
+            //Ejemplo de como se debe manejar la fecha "dd/mm/yyyy/hh:mm"
+            String[] fecha = pd.getFecha_envio().split("/");
+            System.out.println("llegó esto: "+pd.getFecha_envio());
+            LocalDateTime time = LocalDateTime.of(Integer.parseInt(fecha[2]),Integer.parseInt(fecha[1]),Integer.parseInt(fecha[0]),0,0,0);
+            pd.setFecha_entrega(time.plusDays(10).getDayOfMonth()+"/"+time.getMonthValue()+"/"+time.getYear()+"/"+fecha[3]);
+            System.out.println("id:"+pd.getId()+"\nfechaE:"+pd.getFecha_entrega()+"\nfechaEV:"+pd.getFecha_envio());
             pedidoServicio.save(pd);
-            return new ResponseEntity<>(parsedDate.toString(),HttpStatus.OK);
+            return ResponseEntity.ok(pd.getFecha_entrega());
         }catch (PedidoNotFoundException pe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pe.getMessage());
         }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
+            System.out.println("si era esto");
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
         }
     }
 
@@ -122,20 +115,6 @@ public class PedidoController {
     {
         LOGGER.info("Operacion obteniendo ubicaciones");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
-
-        /*if (authToken == null)
-        {
-            LOGGER.warning("Usuario no autorizado para realizar la operación.");
-            throw new WebApplicationException("Debe iniciar sesión para realizar la acción.", Response.status(Response.Status.UNAUTHORIZED)
-                    .header("WWW-Authenticate", "Basic realm=\"Restricted Area\"")
-                    .entity("Usuario no autorizado para realizar la operación.")
-                    .build());
-        }*/
-        //Como verifico que el pedido corresponda a el usuario?
-        /*if(!authorization.substring(7).equals(token)){
-            LOGGER.warning("Usuario no posee permisos para realizar la operación.");
-            throw new WebApplicationException("Usuario no posee permisos para realizar la operación.", Response.Status.FORBIDDEN);
-        }*/
         return new ResponseEntity<>(getRoute(id_pedido), HttpStatus.OK);
     }
 

@@ -3,6 +3,7 @@ package co.edu.uniquindio.Microservicios_API_PF.steps;
 import co.edu.uniquindio.Microservicios_API_PF.dto.CredentialDTO;
 import co.edu.uniquindio.Microservicios_API_PF.dto.RolDTO;
 import co.edu.uniquindio.Microservicios_API_PF.dto.UserWithCredentialsDTO;
+import co.edu.uniquindio.Microservicios_API_PF.dto.UsuarioDTO;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -18,6 +19,7 @@ public class GestionarTokens {
     private String username;
     private String password;
     private String token;
+    private UserWithCredentialsDTO user;
     private String subject="Maria";
 
     private Response response;
@@ -55,7 +57,7 @@ public class GestionarTokens {
                 .password("12345678")
                 .rol(RolDTO.USUARIO)
                 .build();
-        UserWithCredentialsDTO user = UserWithCredentialsDTO
+        user = UserWithCredentialsDTO
                 .builder()
                 .id("1")
                 .correo("jaimito@gmail.com")
@@ -103,6 +105,6 @@ public class GestionarTokens {
 
     @Then("la respuesta debe contener el sujeto del token de autenticación")
     public void la_respuesta_debe_contener_el_sujeto_del_token_de_autenticacion() {
-        assertTrue(response.getBody().asString().equals(subject));
+        assertTrue(response.getBody().asString().equals(user.getCredential().getUsername()));
     }
 }

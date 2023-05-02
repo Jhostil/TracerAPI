@@ -11,24 +11,22 @@ import io.cucumber.java.en.When;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.notNullValue;
 
-public class AgregarEstado {
+public class EstimarFechaEntrega {
 
     private UsuarioDTO usuario;
 
     private EnvioDTO envio;
 
-    private EstadoDTO estado;
-
-    private String id_pedido;
-
     private Response response;
-    @Given("Yo soy un usuario que se encuentra autenticado en el sistema")
-    public void yoSoyUnUsuarioQueSeEncuentraAutenticadoEnElSistema() {
+    @Given("Soy un usuario que me encuentro autenticado en el sistema")
+    public void soyUnUsuarioQueMeEncuentroAutenticadoEnElSistema() {
         usuario = UsuarioDTO
                 .builder()
                 .usuario("Karen")
@@ -36,29 +34,22 @@ public class AgregarEstado {
                 .build();
     }
 
-    @And("En el servidor existe un pedido con id {string}")
-    public void enElServidorExisteUnPedidoConId(String id_pedido) {
-        this.id_pedido = id_pedido;
+    @And("Ya existe un pedido en el servidor con id {string}")
+    public void yaExisteUnPedidoEnElServidorConId(String id_pedido) {
         List<EstadoDTO> estados = new ArrayList<>();
-        estados.add(new EstadoDTO(id_pedido,"llego a New York",DescripcionDTO.EN_BODEGA));
+        estados.add(new EstadoDTO(id_pedido,"llego a New York", DescripcionDTO.EN_BODEGA));
         envio = EnvioDTO
                 .builder()
                 .id(id_pedido)
                 .estado(estados)
-                .fecha_envio("2023-03-05T10:30:00")
-                .fecha_entrega("2023-04-14T09:00:00")
+                .fecha_envio("10/08/2001/05:00")
+                .fecha_entrega("")
                 .build();
         System.out.println("Se creó el pedido: " + envio.toString());
     }
 
-    @When("Hago el llamado del servicio de la Api agregar estado y le envio el estado")
-    public void hagoElLlamadoDelServicioDeLaApiAgregarEstadoYLeEnvioElEstado() {
-        estado = EstadoDTO
-                .builder()
-                .descripcion(DescripcionDTO.EN_BODEGA)
-                .detalle("El producto llego a Santiago de Chile")
-                .id_pedido(id_pedido)
-                .build();
+    @When("Realizo el llamado al servicio de la Api estimar fecha entrega y le envio el id {string}")
+    public void realizoElLlamadoAlServicioDeLaApiEstimarFechaEntregaYLeEnvioElId(String id_pedido) {
         given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer miToken")
@@ -68,13 +59,17 @@ public class AgregarEstado {
         response = given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer miToken")
-                .body(estado)
-                .queryParam(estado.getId_pedido())
-                .patch("http://localhost:8080/pedidos/" + estado.getId_pedido() + "/estado");
+                .get("http://localhost:8080/pedidos/" + id_pedido+"/time");
     }
 
-    @Then("Recibo un estado {int}")
-    public void reciboUnEstado(int status) {
+    @Then("Me llega el estado {int}")
+    public void meLlegaElEstado(int status) {
         response.then().statusCode(status);
+    }
+
+    @And("Me llega la fecha de llegada del pedido")
+    public void meLlegaLaFechaDeLlegadaDelPedido() {
+        response.then()
+                .body("fecha_envio",response->notNullValue());
     }
 }

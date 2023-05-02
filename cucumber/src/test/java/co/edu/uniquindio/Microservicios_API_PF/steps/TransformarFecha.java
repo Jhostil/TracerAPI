@@ -48,7 +48,7 @@ public class TransformarFecha {
                 .queryParam("zona_horaria", zonaHoraria)
     //            .header("Authorization", "Bearer " + "authToken") // Aquí debes establecer el token de autenticación.
                 .when()
-                .get("http://localhost:8080/pedidos/12357/datetime_adjust"); // Aquí debes establecer el id del pedido.
+                .get("http://localhost:8080/pedidos/" + envio.getId() +"/datetime_adjust"); // Aquí debes establecer el id del pedido.
 
         nuevaFechaEntrega = response.getBody().asString();
         System.out.println(nuevaFechaEntrega);

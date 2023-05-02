@@ -8,8 +8,13 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.RestAssured;
+import io.restassured.config.HttpClientConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
@@ -37,7 +42,6 @@ public class BuscarPedido {
         envio = EnvioDTO
                 .builder()
                 .id(id_pedido)
-//                .estado("En Reparto")
                 //.fecha_envio(LocalDateTime.of(2023, 1, 16, 12, 30, 0))
                 //.fecha_entrega(LocalDateTime.of(2023, 5, 12, 9, 30, 0))
                 .fecha_envio("2023-03-05T10:30:00")
@@ -69,6 +73,17 @@ public class BuscarPedido {
 
     @And("la información del envio")
     public void laInformacionDelEnvio() {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setSocketTimeout(10000)
+                .build();
+
+        HttpClient httpClient = HttpClientBuilder.create()
+                .setDefaultRequestConfig(requestConfig)
+                .build();
+
+        RestAssuredConfig config = RestAssured.config()
+                .httpClient(HttpClientConfig.httpClientConfig().httpClient(httpClient));
+
         response.then()
                 .body("id",response->notNullValue())
 //                .body("estado",response->notNullValue())

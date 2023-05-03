@@ -133,7 +133,7 @@ components:
     Pedido:
       type: object
       properties:
-        id_pedido:
+        id:
           type: string
         estado_envio:
           type: object
@@ -141,6 +141,24 @@ components:
           type: string
         fecha_entrega:
           type: string
+        ubicaciones:
+          type: array
+          items:
+            type: object
+            properties:
+              latitud:
+                type: number
+              longitud:
+                type: number
+        transportadora:
+          type: object
+          properties:
+            nombre:
+              type: string
+            direccion:
+              type: string
+            telefono:
+              type: string
     id_pedido_estado_body:
       type: object
       properties:

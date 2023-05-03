@@ -2,6 +2,7 @@ package co.edu.uniquindio.Microservicios_API_PF.steps;
 
 import co.edu.uniquindio.Microservicios_API_PF.dto.EnvioDTO;
 import co.edu.uniquindio.Microservicios_API_PF.dto.TransportadoraDTO;
+import co.edu.uniquindio.Microservicios_API_PF.dto.UbicacionDTO;
 import co.edu.uniquindio.Microservicios_API_PF.dto.UsuarioDTO;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -9,6 +10,9 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
@@ -20,6 +24,8 @@ public class MostrarInfoTransportadora {
     private TransportadoraDTO transportadora;
 
     private EnvioDTO envio;
+
+    private UbicacionDTO ubicacion;
 
     private Response response;
 
@@ -34,6 +40,25 @@ public class MostrarInfoTransportadora {
 
     @And("existe un pedido con el id {string}")
     public void existeUnPedidoConElId(String id_pedido) {
+
+        List<UbicacionDTO> ubicaciones = new ArrayList<>();
+
+        ubicacion = UbicacionDTO
+                .builder()
+                .latitud(-23.098738)
+                .longitud(12.462098)
+                .build();
+
+        ubicaciones.add(ubicacion);
+
+        //ubicacion = new UbicacionDTO(-70.109284,-15.633680);
+        ubicacion = UbicacionDTO
+                .builder()
+                .latitud(-70.109284)
+                .longitud(-15.633680)
+                .build();
+        ubicaciones.add(ubicacion);
+
         transportadora = TransportadoraDTO
                 .builder()
                 .nombre("Servientrega")
@@ -47,6 +72,7 @@ public class MostrarInfoTransportadora {
                 .fecha_envio("2023-03-05T10:30:00")
                 .fecha_entrega("2023-04-14T09:00:00")
                 .transportadora(transportadora)
+                .ubicaciones(ubicaciones)
                 .build();
     }
 

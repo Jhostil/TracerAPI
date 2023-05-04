@@ -122,6 +122,73 @@ paths:
       responses:
         "200":
           description: OK
+  /tokens/generacion:
+    post:
+      summary: Genera un token de autenticación
+      description: Permite generar un token de autenticación para un usuario dado
+      parameters:
+        - name: subject
+          in: query
+          description: Nombre del usuario para el cual se generará el token
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+  /tokens/validacion:
+    get:
+      summary: Valida un token de autenticación
+      description: Permite validar un token de autenticación para un usuario dado
+      parameters:
+        - name: tokenString
+          in: query
+          description: Token de autenticación a validar
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+      requestBody:
+        description: Información del usuario para el cual se validará el token
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /tokens/sujeto:
+    get:
+      summary: Obtiene el nombre del usuario asociado a un token de autenticación
+      description: Permite obtener el nombre del usuario asociado a un token de autenticación
+      parameters:
+        - name: tokenString
+          in: query
+          description: Token de autenticación del cual se desea conocer el nombre del usuario
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
 components:
   schemas:
     Pedido:
@@ -145,3 +212,12 @@ components:
           properties:
             descripcion:
               type: string
+    Usuario:
+      type: object
+      properties:
+        nombre:
+          type: string
+        correoElectronico:
+          type: string
+        contrasenia:
+          type: string

@@ -13,6 +13,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
@@ -69,17 +70,6 @@ public class BuscarPedido {
 
     @And("la información del envio")
     public void laInformacionDelEnvio() {
-        RequestConfig requestConfig = RequestConfig.custom()
-                .setSocketTimeout(10000)
-                .build();
-
-        HttpClient httpClient = HttpClientBuilder.create()
-                .setDefaultRequestConfig(requestConfig)
-                .build();
-
-        RestAssuredConfig config = RestAssured.config()
-                .httpClient(HttpClientConfig.httpClientConfig().httpClient(httpClient));
-
         response.then()
                 .body("id",response->notNullValue())
 //                .body("estado",response->notNullValue())

@@ -1,6 +1,8 @@
 package co.edu.uniquindio.Microservicios_API_PF.steps;
 
+import co.edu.uniquindio.Microservicios_API_PF.dto.DescripcionDTO;
 import co.edu.uniquindio.Microservicios_API_PF.dto.EnvioDTO;
+import co.edu.uniquindio.Microservicios_API_PF.dto.EstadoDTO;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -11,6 +13,8 @@ import io.restassured.response.Response;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,14 +28,15 @@ public class TransformarFecha {
 
     @Given("que el usuario tiene un pedido con el id {string}")
     public void queElUsuarioTieneUnPedidoConElId(String id_pedido) {
+        List<EstadoDTO> estados = new ArrayList<>();
+        LocalDateTime date = LocalDateTime.now();
+        estados.add(new EstadoDTO(id_pedido,"llego a New York", DescripcionDTO.EN_BODEGA));
         envio = EnvioDTO
                 .builder()
                 .id(id_pedido)
-                //.estado("En Reparto")
-                //.fecha_envio(LocalDateTime.of(2023, 1, 16, 12, 30, 0))
-                //.fecha_entrega(LocalDateTime.of(2023, 5, 12, 9, 30, 0))
-                .fecha_envio("2023-03-05T10:30:00")
-                .fecha_entrega("27/04/2023 15:00")
+                .estado(estados)
+                .fecha_envio("05/03/2023/10:30")
+                .fecha_entrega("27/04/2023/16:00")
                 .build();
 
         //Guardo el envio
@@ -58,7 +63,7 @@ public class TransformarFecha {
 
     @Then("el usuario obtiene la nueva fecha de entrega {string}")
     public void elUsuarioObtieneLaNuevaFechaDeEntregaSegúnLaZonaHorariaDeBogota(String nuevaFecha) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy'T'HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy/HH:mm");
         LocalDateTime expectedDateTime = LocalDateTime.parse(nuevaFecha, formatter);
         LocalDateTime actualDateTime = LocalDateTime.parse(nuevaFechaEntrega, formatter);
 

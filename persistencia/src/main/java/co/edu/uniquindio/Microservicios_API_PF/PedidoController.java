@@ -148,12 +148,12 @@ public class PedidoController {
         Optional<Pedido> pedido = pedidoServicio.findById_pedido(idPedido);
         if (pedido.isPresent()) {
             String fechaEntrega = pedido.get().getFecha_entrega();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy/HH:mm");
             LocalDateTime localDateTime = LocalDateTime.parse(fechaEntrega, formatter);
             ZoneId zonaHorariaActual = ZoneId.of("America/New_York");
             ZoneId zonaHorariaNueva = ZoneId.of(zonaHoraria);
             LocalDateTime nuevaFechaEntrega = localDateTime.atZone(zonaHorariaActual).withZoneSameInstant(zonaHorariaNueva).toLocalDateTime();
-            return ResponseEntity.ok(nuevaFechaEntrega.toString());
+            return ResponseEntity.ok(nuevaFechaEntrega.format(formatter));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

@@ -76,5 +76,11 @@ public class AgregarEstado {
     @Then("Recibo un estado {int}")
     public void reciboUnEstado(int status) {
         response.then().statusCode(status);
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer miToken")
+                .body(estado)
+                .queryParam(estado.getId_pedido())
+                .delete("http://localhost:8080/pedidos/eliminación");
     }
 }

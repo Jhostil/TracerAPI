@@ -1,6 +1,7 @@
 package co.edu.uniquindio.Microservicios_API_PF.steps;
 
 import co.edu.uniquindio.Microservicios_API_PF.dto.EnvioDTO;
+import co.edu.uniquindio.Microservicios_API_PF.dto.TransportadoraDTO;
 import co.edu.uniquindio.Microservicios_API_PF.dto.UsuarioDTO;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -12,17 +13,18 @@ import io.restassured.response.Response;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
 
-public class BuscarPedido {
+public class MostrarInfoTransportadora {
 
     private UsuarioDTO usuario;
+
+    private TransportadoraDTO transportadora;
 
     private EnvioDTO envio;
 
     private Response response;
 
-
-    @Given("Soy un usuario que estoy autenticado en el sistema")
-    public void soyUnUsuarioQueEstoyAutenticadoEnElSistema() {
+    @Given("Soy un usuario  autenticado en el sistema")
+    public void soyUnUsuarioAutenticadoEnElSistema() {
         usuario = UsuarioDTO
                 .builder()
                 .usuario("pedro")
@@ -30,19 +32,26 @@ public class BuscarPedido {
                 .build();
     }
 
-    @And("existe un pedido con el identificador {string}")
-    public void existeUnPedidoConElIdentificador(String id_pedido) {
+    @And("existe un pedido con el id {string}")
+    public void existeUnPedidoConElId(String id_pedido) {
+        transportadora = TransportadoraDTO
+                .builder()
+                .nombre("Servientrega")
+                .direccion("cra 19 # 19-21 Armenia")
+                .telefono("7584752")
+                .build();
+
         envio = EnvioDTO
                 .builder()
                 .id(id_pedido)
                 .fecha_envio("2023-03-05T10:30:00")
                 .fecha_entrega("2023-04-14T09:00:00")
+                .transportadora(transportadora)
                 .build();
-        System.out.println("Se creó el pedido: " + envio.toString());
     }
 
-    @When("invoco el servicio de busqueda de envios ingresando el id {string}")
-    public void invocoElServicioDeBusquedaDeEnviosIngresandoElId(String id_pedido) {
+    @When("invoco el servicio de busqueda de la empresa transportadora ingresando el id {string}")
+    public void invocoElServicioDeBusquedaDeLaEmpresaTransportadoraIngresandoElId(String id_pedido) {
         //Guardo el envio
         given()
                 .contentType(ContentType.JSON)
@@ -53,21 +62,18 @@ public class BuscarPedido {
         response = given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer miToken")
-                .get("http://localhost:8080/pedidos/" + id_pedido);
-
+                .get("http://localhost:8080/pedidos/" + id_pedido + "/transportadoras");
     }
 
-    @Then("obtengo un status code {int}")
-    public void obtengoUnStatusCode(int status) {
+    @Then("obtengo un codigo http {int}")
+    public void obtengoUnCodigoHttp(int status) {
         response.then().statusCode(status);
     }
 
-    @And("la información del envio")
-    public void laInformacionDelEnvio() {
+    @And("la información de la transportadora")
+    public void laInformacionDeLaTransportadora() {
         response.then()
                 .body("id",response->notNullValue())
-                .body("estado",response->notNullValue())
-                .body("fecha_envio",response->notNullValue())
-                .body("fecha_entrega",response->notNullValue());
+                .body("transportadora",response->notNullValue());
     }
 }

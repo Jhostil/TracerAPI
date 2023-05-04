@@ -155,13 +155,14 @@ paths:
           explode: true
           schema:
             type: string
-      requestBody:
-        description: Información del usuario para el cual se validará el token
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Usuario'
+        - name: correo
+          in: query
+          description: correo electronico del usuario que quiere validar su token
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
       responses:
         "200":
           description: OK
@@ -235,9 +236,31 @@ components:
     Usuario:
       type: object
       properties:
+        id:
+          type: string
         nombre:
           type: string
-        correoElectronico:
+        apellido:
           type: string
-        contrasenia:
+        correo:
           type: string
+        credential:
+          type: object
+          properties:
+            id:
+              type: string
+            username:
+              type: string
+            password:
+              type: string
+            rol:
+              type: string
+              enum:
+                - EMPLEADO
+                - ADMINISTRADOR
+                - USUARIO
+              description: Rol del usuario
+
+
+
+

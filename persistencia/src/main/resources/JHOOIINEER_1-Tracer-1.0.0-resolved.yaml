@@ -139,13 +139,30 @@ components:
           type: array
         fecha_envio:
           type: string
+      ubicaciones:
+          type: array
+          items:
+            type: object
+            properties:
+              latitud:
+                type: number
+              longitud:
+                type: number
+      transportadora:
+          type: object
+          properties:
+            nombre:
+              type: string
+            direccion:
+              type: string
+            telefono:
+              type: string
     id_pedido_estado_body:
       type: object
       properties:
-        id:
+        estado_envio:
           type: string
-        detalle:
-          type: string
+          example: entregado
         descripcion:
           type: object
           properties:

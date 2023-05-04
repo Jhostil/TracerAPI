@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -140,23 +141,6 @@ public class PedidoController {
         return pedido.orElseThrow(() -> new PedidoNotFoundException("Pedido no encontrado."));
     }
 
-    @GetMapping("{id_pedido}/datetime_adjust")
-    public ResponseEntity<String> convertirFechaEntrega(@PathVariable("id_pedido") String idPedido, @RequestHeader("ubicacion_cliente") String zonaHoraria) {
-        Objects.requireNonNull(idPedido, "El id del pedido no puede ser nulo");
-
-        Optional<Pedido> pedido = pedidoServicio.findById_pedido(idPedido);
-        if (pedido.isPresent()) {
-            String fechaEntrega = pedido.get().getFecha_entrega();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            LocalDateTime localDateTime = LocalDateTime.parse(fechaEntrega, formatter);
-            ZoneId zonaHorariaActual = ZoneId.of("America/New_York");
-            ZoneId zonaHorariaNueva = ZoneId.of(zonaHoraria);
-            LocalDateTime nuevaFechaEntrega = localDateTime.atZone(zonaHorariaActual).withZoneSameInstant(zonaHorariaNueva).toLocalDateTime();
-            return ResponseEntity.ok(nuevaFechaEntrega.toString());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
 
     @GetMapping("{id_pedido}/transportadoras")
     public ResponseEntity<?> obtenerTransportadora (@PathVariable("id_pedido") String id_pedido)
@@ -172,6 +156,35 @@ public class PedidoController {
             return new ResponseEntity<>(getRoute(id_pedido), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>("Hubo un error, por favor intente de nuevo",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("{id_pedido}/datetime_adjust")
+    public ResponseEntity<String> convertirFechaEntrega(@PathVariable("id_pedido") String idPedido, @RequestParam("zona_horaria") String zonaHoraria) {
+        Objects.requireNonNull(idPedido, "El id del pedido no puede ser nulo");
+
+
+        System.out.println(idPedido);
+        Optional<Pedido> pedido = pedidoServicio.findById_pedido(idPedido);
+        System.out.println(pedido.get().getId());
+        if (pedido.isPresent()) {
+            System.out.println("if");
+            String fechaEntrega = pedido.get().getFecha_entrega();
+            System.out.println(fechaEntrega);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            LocalDateTime localDateTime = LocalDateTime.parse(fechaEntrega, formatter);
+            System.out.println(localDateTime);
+            ZoneId zonaHorariaOriginal = ZoneId.of("America/New_York");
+            ZoneId zonaHorariaNueva = ZoneId.of(zonaHoraria);
+            ZonedDateTime zonedDateTimeOriginal = localDateTime.atZone(zonaHorariaOriginal);
+            ZonedDateTime zonedDateTimeNueva = zonedDateTimeOriginal.withZoneSameInstant(zonaHorariaNueva);
+            LocalDateTime nuevaFechaEntrega = zonedDateTimeNueva.toLocalDateTime();
+            String fechaFormateada = nuevaFechaEntrega.format(formatter);
+            System.out.println(nuevaFechaEntrega);
+            return ResponseEntity.ok(fechaFormateada);
+        } else {
+            System.out.println("else");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

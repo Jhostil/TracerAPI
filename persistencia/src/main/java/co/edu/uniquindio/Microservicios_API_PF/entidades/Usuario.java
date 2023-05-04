@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import java.io.Serializable;
 
 @Getter
@@ -14,20 +15,23 @@ import java.io.Serializable;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Credential implements Serializable {
+public class Usuario implements Serializable {
 
     @Id
     @JsonProperty("id")
     private String id;
 
     @Column(unique = true)
-    @JsonProperty("username")
-    private String username;
+    @JsonProperty("correo")
+    private String correo;
 
-    @JsonProperty("password")
-    private String password;
+    @JsonProperty("nombre")
+    private String nombre;
 
-    @JsonProperty("rol")
-    private Rol rol;
+    @JsonProperty("apellido")
+    private String apellido;
 
+    @OneToOne
+    @JsonProperty("credential")
+    private Credential credential;
 }

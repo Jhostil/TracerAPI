@@ -23,7 +23,6 @@ public class TransformarFecha {
 
     private EnvioDTO envio;
     private String nuevaFechaEntrega = "2023-04-20 16:30:00";
-    private String idPedido;
     private Response response;
 
     @Given("que el usuario tiene un pedido con el id {string}")
@@ -38,24 +37,22 @@ public class TransformarFecha {
                 .fecha_envio("05/03/2023/10:30")
                 .fecha_entrega("27/04/2023/16:00")
                 .build();
-
         //Guardo el envio
         given()
                 .contentType(ContentType.JSON)
                 .body(envio)
                 .post("http://localhost:8080/pedidos");
 
-        this.idPedido = id_pedido;
     }
 
     @When("el usuario convierte la fecha de entrega a la zona horaria de {string}")
     public void elUsuarioConvierteLaFechaDeEntregaALaZonaHorariaDe(String zonaHoraria) {
 
         response = RestAssured.given()
-                .header("ubicacion_cliente", zonaHoraria)
-                .header("Authorization", "Bearer " + "authToken") // Aquí debes establecer el token de autenticación.
+                .queryParam("zona_horaria", zonaHoraria)
+    //            .header("Authorization", "Bearer " + "authToken") // Aquí debes establecer el token de autenticación.
                 .when()
-                .get("http://localhost:8080/pedidos/12357/datetime_adjust"); // Aquí debes establecer el id del pedido.
+                .get("http://localhost:8080/pedidos/" + envio.getId() +"/datetime_adjust"); // Aquí debes establecer el id del pedido.
 
         nuevaFechaEntrega = response.getBody().asString();
         System.out.println(nuevaFechaEntrega);
@@ -71,7 +68,8 @@ public class TransformarFecha {
 
         response = given()
                 .contentType(ContentType.JSON)
-                .header("Authorization", "Bearer miToken")
+  //              .header("Authorization", "Bearer miToken")
+                .queryParam("zona_horaria", "America/Bogota")
                 .get("http://localhost:8080/pedidos/" + envio.getId() + "/datetime_adjust");
     }
 

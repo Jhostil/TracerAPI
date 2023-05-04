@@ -37,13 +37,12 @@ public class EstimarFechaEntrega {
     @And("Ya existe un pedido en el servidor con id {string}")
     public void yaExisteUnPedidoEnElServidorConId(String id_pedido) {
         List<EstadoDTO> estados = new ArrayList<>();
-        LocalDateTime date = LocalDateTime.now();
         estados.add(new EstadoDTO(id_pedido,"llego a New York", DescripcionDTO.EN_BODEGA));
         envio = EnvioDTO
                 .builder()
                 .id(id_pedido)
                 .estado(estados)
-                .fecha_envio(date.toString())
+                .fecha_envio("10/08/2001/05:00")
                 .fecha_entrega("")
                 .build();
         System.out.println("Se creó el pedido: " + envio.toString());

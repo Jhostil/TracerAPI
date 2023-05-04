@@ -50,7 +50,6 @@ public class TransformarFecha {
 
         response = RestAssured.given()
                 .queryParam("zona_horaria", zonaHoraria)
-    //            .header("Authorization", "Bearer " + "authToken") // Aquí debes establecer el token de autenticación.
                 .when()
                 .get("http://localhost:8080/pedidos/" + envio.getId() +"/datetime_adjust"); // Aquí debes establecer el id del pedido.
 
@@ -68,7 +67,6 @@ public class TransformarFecha {
 
         response = given()
                 .contentType(ContentType.JSON)
-  //              .header("Authorization", "Bearer miToken")
                 .queryParam("zona_horaria", "America/Bogota")
                 .get("http://localhost:8080/pedidos/" + envio.getId() + "/datetime_adjust");
     }

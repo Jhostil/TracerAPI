@@ -27,6 +27,6 @@ public class Estado implements Serializable {
     private Descripcion descripcion;
 
     @ManyToOne
-    @JoinColumn(name = "pedido_id_pedido")
+    @JoinColumn(name = "pedido_id")
     private Pedido pedido;
 }

@@ -46,7 +46,7 @@ public class PedidoController {
     public void create (@RequestBody Pedido pedido)
     {
         pedidoServicio.save(pedido);
-
+        System.out.println(pedido.getUbicaciones());
         if (!pedido.getUbicaciones().isEmpty())
         {
             guardarUbicaciones (pedido);

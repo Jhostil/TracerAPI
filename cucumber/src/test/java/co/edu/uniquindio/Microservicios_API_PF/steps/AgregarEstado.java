@@ -70,11 +70,25 @@ public class AgregarEstado {
                 .header("Authorization", "Bearer miToken")
                 .body(estado)
                 .queryParam(estado.getId_pedido())
-                .patch("http://localhost:8080/pedidos/" + id_pedido);
+                .patch("http://localhost:8080/pedidos/" + estado.getId_pedido());
     }
 
     @Then("Recibo un estado {int}")
     public void reciboUnEstado(int status) {
         response.then().statusCode(status);
+    }
+
+    @And("En el servidor no existe un pedido con id {string}")
+    public void enElServidorNoExisteUnPedidoConId(String id_pedido) {
+        List<EstadoDTO> estados = new ArrayList<>();
+        estados.add(new EstadoDTO(id_pedido,"llego a New York",DescripcionDTO.EN_BODEGA));
+        envio = EnvioDTO
+                .builder()
+                .id(id_pedido+"a")
+                .estado(estados)
+                .fecha_envio("10/8/2023/05:00")
+                .fecha_entrega("")
+                .build();
+        System.out.println("Se creó el pedido: " + envio.toString());
     }
 }

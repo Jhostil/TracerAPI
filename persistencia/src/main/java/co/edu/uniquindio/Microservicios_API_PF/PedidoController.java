@@ -51,7 +51,7 @@ public class PedidoController {
         return new ResponseEntity<>(getAndVerify(id_pedido), HttpStatus.OK);
     }
 
-    @PatchMapping("{id_pedido}/estado")
+    @PatchMapping("{id_pedido}")
     private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestBody Estado estado) {
         LOGGER.info("Operacion agregando nuevo estado");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
@@ -66,7 +66,6 @@ public class PedidoController {
         }catch (PedidoNotFoundException pe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pe.getMessage());
         }catch (Exception e) {
-            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
         }
     }
@@ -75,23 +74,23 @@ public class PedidoController {
         pedidoServicio.saveEstado(estado);
     }
     @GetMapping("{id_pedido}/time")
-    private ResponseEntity<String> estimarFechaEntrega(@PathVariable String id_pedido) {
+    private ResponseEntity<Pedido> estimarFechaEntrega(@PathVariable String id_pedido) {
         LOGGER.info("Operacion estima fecha de entrega de un producto");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
+        Pedido pd = getAndVerify(id_pedido);
         try {
-            Pedido pd = getAndVerify(id_pedido);
-
-            //Ejemplo de como se debe manejar la fecha "Fri, 07 Aug 2020 18:00:00 +0000";
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, dd MMM yyyy HH:mm:ss Z", Locale.ROOT);
-            OffsetDateTime parsedDate = OffsetDateTime.parse(pd.getFecha_envio(), formatter);
-            parsedDate = parsedDate.plusDays(10L);
-            pd.setFecha_entrega(parsedDate.toString());
+            //Ejemplo de como se debe manejar la fecha dd/mm/yyyy/hh:mm
+            String[] fecha = pd.getFecha_envio().split("/");
+            LocalDateTime time = LocalDateTime.of(Integer.parseInt(fecha[2]),Integer.parseInt(fecha[1]),Integer.parseInt(fecha[0]),0,0);
+            time = time.plusDays(10);
+            pd.setFecha_entrega(time.getDayOfMonth()+"/"+time.getMonthValue()+"/"+time.getYear()+"/"+fecha[3]);
+            System.out.println(pd.getFecha_entrega()+"\n"+pd.getFecha_envio());
             pedidoServicio.save(pd);
-            return new ResponseEntity<>(parsedDate.toString(),HttpStatus.OK);
+            return new ResponseEntity<>(pd,HttpStatus.OK);
         }catch (PedidoNotFoundException pe) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pe.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
         }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(pd);
         }
     }
 

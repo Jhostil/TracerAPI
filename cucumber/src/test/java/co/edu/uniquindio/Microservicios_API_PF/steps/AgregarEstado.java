@@ -69,7 +69,7 @@ public class AgregarEstado {
                 .header("Authorization", "Bearer miToken")
                 .body(estado)
                 .queryParam(id_pedido)
-                .patch("http://localhost:8080/pedidos/" + estado.getId_pedido());
+                .patch("http://localhost:8080/pedidos/" + estado.getId_pedido() + "/addEstado");
     }
 
     @Then("Recibo un estado {int}")

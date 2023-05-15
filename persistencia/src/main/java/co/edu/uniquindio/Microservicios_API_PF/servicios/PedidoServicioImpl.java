@@ -46,10 +46,11 @@ public class PedidoServicioImpl implements PedidoServicio{
     }
 
     public void saveEstado(Estado estado) {
-
+        System.out.println("Llegue");
         //pedidos.add(pedido);
         try {
             estadoRepo.save(estado); // intentamos guardar el pedido en la base de datos
+            System.out.println("Sali");
         } catch (TransactionRequiredException e) {
             // si ocurre una excepción de tipo TransactionRequiredException, la relanzamos como RuntimeException
             throw new RuntimeException(e);

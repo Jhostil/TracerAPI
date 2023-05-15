@@ -58,8 +58,8 @@ public class MostrarTrayectoria {
 
         envio = EnvioDTO
                 .builder()
-                .id(id_pedido).fecha_envio("2023-03-05T10:30:00")
-                .fecha_entrega("2023-04-14T09:00:00")
+                .id(id_pedido).fecha_envio("10/8/2022/05:00")
+                .fecha_entrega("")
                 .ubicaciones(ubicaciones)
                 .build();
     }

@@ -49,8 +49,8 @@ public class GestionarTokens {
                 .builder()
                 .id("")
                 //.estado("En Reparto")
-                .fecha_envio("2023-03-05T10:30:00")
-                .fecha_entrega("2023-04-14T09:00:00")
+                .fecha_envio("10/8/2022/05:00")
+                .fecha_entrega("")
                 .build();
 
         response = RestAssured.given()

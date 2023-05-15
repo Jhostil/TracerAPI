@@ -70,14 +70,13 @@ public class PedidoController {
         return new ResponseEntity<>(getAndVerify(id_pedido), HttpStatus.OK);
     }
 
-    @PatchMapping("{id_pedido}")
+    @PatchMapping("{id_pedido}/addEstado")
     private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestBody Estado estado) {
         LOGGER.info("Operacion agregando nuevo estado");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
         try {
             Pedido pd = getAndVerify(id_pedido);
             pd.getEstado().add(estado);
-            estado.setId(id_pedido);
             estado.setPedido(pd);
             guardarEstado(estado);
             pedidoServicio.save(pd);
@@ -90,6 +89,7 @@ public class PedidoController {
     }
 
     private void guardarEstado(Estado estado) {
+        LOGGER.info("Se guardó el estado del producto");
         pedidoServicio.saveEstado(estado);
     }
     @GetMapping("{id_pedido}/time")
@@ -162,16 +162,11 @@ public class PedidoController {
     @GetMapping("{id_pedido}/datetime_adjust")
     public ResponseEntity<String> convertirFechaEntrega(@PathVariable("id_pedido") String idPedido, @RequestParam("zona_horaria") String zonaHoraria) {
         Objects.requireNonNull(idPedido, "El id del pedido no puede ser nulo");
-
-
         System.out.println(idPedido);
         Optional<Pedido> pedido = pedidoServicio.findById_pedido(idPedido);
-        System.out.println(pedido.get().getId());
         if (pedido.isPresent()) {
-            System.out.println("if");
             String fechaEntrega = pedido.get().getFecha_entrega();
-            System.out.println(fechaEntrega);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy/HH:mm");
             LocalDateTime localDateTime = LocalDateTime.parse(fechaEntrega, formatter);
             System.out.println(localDateTime);
             ZoneId zonaHorariaOriginal = ZoneId.of("America/New_York");
@@ -183,8 +178,8 @@ public class PedidoController {
             System.out.println(nuevaFechaEntrega);
             return ResponseEntity.ok(fechaFormateada);
         } else {
-            System.out.println("else");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+
     }
 }

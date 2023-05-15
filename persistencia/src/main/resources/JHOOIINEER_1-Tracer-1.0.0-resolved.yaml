@@ -5,26 +5,26 @@ info:
   description: API que permite gestionar el servicio de rastreo de los paquetes de los usuarios de la tienda virtual
   version: 1.0.0
 servers:
-- url: http://localhost:8080
-  description: SwaggerHub API Auto Mocking
+  - url: http://localhost:8080
+    description: SwaggerHub API Auto Mocking
 security:
-- application:
-  - read
-  - write
+  - application:
+      - read
+      - write
 paths:
-  /pedidos/{id_pedido}/estado:
+  /pedidos/{id_pedido}/addEstado:
     patch:
       summary: Permite asignar estado a un pedido
-      description: This is an example operation to show how security is applied to the call.
+      description: Esta operación permite agregar un estado a un pedido dado su id y el estado que se desea agregar
       parameters:
-      - name: id_pedido
-        in: path
-        description: ID del pedido a actualizar
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: id_pedido
+          in: path
+          description: ID del pedido a actualizar
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -39,14 +39,14 @@ paths:
       summary: Permite rastrear de un pedido dado su ID
       description: Esta operación permite obtener los atributos relacionados a un pedido dado su identificador
       parameters:
-      - name: id
-        in: path
-        description: ID del pedido a buscar
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: ID del pedido a buscar
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: OK
@@ -59,20 +59,20 @@ paths:
       summary: Permite buscar un pedido dado su ID
       description: This is an example operation to show how security is applied to the call.
       parameters:
-      - name: id
-        in: path
-        description: ID del pedido a buscar
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        description: Token de autorización del usuario
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: ID del pedido a buscar
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          description: Token de autorización del usuario
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: OK
@@ -83,16 +83,16 @@ paths:
   /pedidos/{id_pedido}/time:
     get:
       summary: Permite obtener la fecha estimada de entrega de un pedido
-      description: This is an example operation to show how security is applied to the call.
+      description: Esta operación permite estimar la fecha de entrega de un producto dado su id
       parameters:
-      - name: id_pedido
-        in: path
-        description: ID del pedido
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: id_pedido
+          in: path
+          description: ID del pedido
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: OK
@@ -101,14 +101,14 @@ paths:
       summary: Permite obtener la información de la transportadora encargada de entregar el pedido
       description: This is an example operation to show how security is applied to the call.
       parameters:
-      - name: id_pedido
-        in: path
-        description: ID del pedido a consultar
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: id_pedido
+          in: path
+          description: ID del pedido a consultar
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: OK
@@ -117,29 +117,37 @@ paths:
       summary: Permite ajustar la zona horaria
       description: This is an example operation to show how security is applied to the call.
       parameters:
-      - name: id_pedido
-        in: path
-        description: ID del pedido al cual se le ajustará la zona horaria
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: id_pedido
+          in: path
+          description: ID del pedido al cual se le ajustará la zona horaria
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         "200":
           description: OK
 components:
   schemas:
+    id_pedido_estado_body:
+      type: object
+      properties:
+        estado_envio:
+          type: string
+          example: entregado
     Pedido:
       type: object
       properties:
         id:
           type: string
         estado_envio:
-          type: array
+          type: object
         fecha_envio:
           type: string
-      ubicaciones:
+        fecha_entrega:
+          type: string
+        ubicaciones:
           type: array
           items:
             type: object
@@ -148,7 +156,7 @@ components:
                 type: number
               longitud:
                 type: number
-      transportadora:
+        transportadora:
           type: object
           properties:
             nombre:
@@ -156,15 +164,4 @@ components:
             direccion:
               type: string
             telefono:
-              type: string
-    id_pedido_estado_body:
-      type: object
-      properties:
-        estado_envio:
-          type: string
-          example: entregado
-        descripcion:
-          type: object
-          properties:
-            descripcion:
               type: string

@@ -10,8 +10,8 @@ Feature: El Api proporciona el servicio de estimar fecha de entrega enviando el 
   Scenario: Yo soy un Usuario validado en el servidor
     Quiero conocer la fecha estimada de entrega de un pedido enviando el id del pedido
     Given Soy un usuario que me encuentro autenticado en el sistema
-    And No existe un pedido en el servidor con el id "123"
-    When Realizo el llamado al servicio de la Api estimar fecha entrega y le envio el id "123"
+    And No existe un pedido en el servidor con el id "268"
+    When Realizo el llamado al servicio de la Api estimar fecha entrega y le envio el id "268"
     Then Me llega el estado 404
 
   Scenario: Yo soy un Usuario validado en el servidor

@@ -43,14 +43,12 @@ public class TransformarFecha {
                 .body(envio)
                 .post("http://localhost:8080/pedidos");
 
-
     }
 
     @When("el usuario convierte la fecha de entrega a la zona horaria de {string}")
     public void elUsuarioConvierteLaFechaDeEntregaALaZonaHorariaDe(String zonaHoraria) {
         response = RestAssured.given()
                 .queryParam("zona_horaria", zonaHoraria)
-                //            .header("Authorization", "Bearer " + "authToken") // Aquí debes establecer el token de autenticación.
                 .when()
                 .get("http://localhost:8080/pedidos/" + envio.getId() +"/datetime_adjust"); // Aquí debes establecer el id del pedido.
 
@@ -59,7 +57,7 @@ public class TransformarFecha {
     }
 
     @Then("el usuario obtiene la nueva fecha de entrega {string}")
-    public void elUsuarioObtieneLaNuevaFechaDeEntregaSegunLaZonaHorariaDeBogota(String nuevaFecha) {
+    public void elUsuarioObtieneLaNuevaFechaDeEntregaSegúnLaZonaHorariaDeBogota(String nuevaFecha) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy/HH:mm");
         LocalDateTime expectedDateTime = LocalDateTime.parse(nuevaFecha, formatter);
         LocalDateTime actualDateTime = LocalDateTime.parse(nuevaFechaEntrega, formatter);
@@ -68,7 +66,6 @@ public class TransformarFecha {
 
         response = given()
                 .contentType(ContentType.JSON)
-                //              .header("Authorization", "Bearer miToken")
                 .queryParam("zona_horaria", "America/Bogota")
                 .get("http://localhost:8080/pedidos/" + envio.getId() + "/datetime_adjust");
     }

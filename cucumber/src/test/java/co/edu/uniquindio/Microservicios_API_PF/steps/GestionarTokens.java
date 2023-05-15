@@ -16,6 +16,7 @@ public class GestionarTokens {
     private String username;
     private String password;
     private String token;
+    private UserWithCredentialsDTO user;
     private String subject="Maria";
 
     private Response response;
@@ -44,19 +45,32 @@ public class GestionarTokens {
     }
 
     @Given("que tengo un token de autenticación válido")
-    public void que_tengo_un_token_de_autenticacion_valido() {
-        EnvioDTO envio = EnvioDTO
+    public void que_tengo_un_token_de_autenticacion_valido(){
+
+        CredentialDTO credential = CredentialDTO
                 .builder()
-                .id("")
-                //.estado("En Reparto")
-                .fecha_envio("10/8/2022/05:00")
-                .fecha_entrega("")
+                .id("0")
+                .username("Jaime123")
+                .password("12345678")
+                .rol(RolDTO.USUARIO)
                 .build();
+        user = UserWithCredentialsDTO
+                .builder()
+                .id("1")
+                .correo("jaimito@gmail.com")
+                .nombre("Jaime")
+                .apellido("vergara")
+                .credential(credential)
+                .build();
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(user)
+                .post("http://localhost:8080/usuarios");
 
         response = RestAssured.given()
                 .contentType(ContentType.JSON)
-                .queryParam("subject", subject)
-                .body(envio)
+                .queryParam("subject", user.getCredential().getUsername())
                 .post("http://localhost:8080/tokens/generacion");
 
         token = response.getBody().asString(); // agregar esta línea para almacenar el nuevo token
@@ -64,6 +78,7 @@ public class GestionarTokens {
         response = RestAssured.given()
                 .contentType(ContentType.JSON)
                 .queryParam("tokenString", token)
+                .queryParam(user.getCorreo())
                 .get("http://localhost:8080/tokens/validacion");
     }
 
@@ -87,6 +102,6 @@ public class GestionarTokens {
 
     @Then("la respuesta debe contener el sujeto del token de autenticación")
     public void la_respuesta_debe_contener_el_sujeto_del_token_de_autenticacion() {
-        assertTrue(response.getBody().asString().equals(subject));
+        assertTrue(response.getBody().asString().equals(user.getCredential().getUsername()));
     }
 }

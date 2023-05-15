@@ -47,7 +47,7 @@ public class PedidoController {
     public void create (@RequestBody Pedido pedido)
     {
         pedidoServicio.save(pedido);
-        System.out.println(pedido.getUbicaciones());
+
         if (!pedido.getUbicaciones().isEmpty())
         {
             guardarUbicaciones (pedido);
@@ -178,8 +178,25 @@ public class PedidoController {
             System.out.println(nuevaFechaEntrega);
             return ResponseEntity.ok(fechaFormateada);
         } else {
+            System.out.println("else");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
 
+    @GetMapping("{id_pedido}/transportadoras")
+    public ResponseEntity<?> obtenerTransportadora (@PathVariable("id_pedido") String id_pedido)
+    {
+        LOGGER.info("Operacion obtener información de la transportadora");
+        Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
+        try {
+
+            Pedido pd = getAndVerify(id_pedido);
+
+            return new ResponseEntity<>(pd,HttpStatus.OK);
+        } catch (PedidoNotFoundException pe) {
+            return new ResponseEntity<>(getRoute(id_pedido), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Hubo un error, por favor intente de nuevo",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

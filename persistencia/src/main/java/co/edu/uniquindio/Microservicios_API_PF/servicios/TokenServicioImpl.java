@@ -1,7 +1,9 @@
 package co.edu.uniquindio.Microservicios_API_PF.servicios;
 
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Token;
+import co.edu.uniquindio.Microservicios_API_PF.entidades.Usuario;
 import co.edu.uniquindio.Microservicios_API_PF.repositorios.TokenRepo;
+import co.edu.uniquindio.Microservicios_API_PF.repositorios.UsuarioRepo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -23,10 +25,12 @@ public class TokenServicioImpl implements TokenServicio {
 
     private final TokenRepo tokenRepository;
     private final SecretKey secretKey;
+    private final UsuarioRepo usuarioRepository;
 
-    public TokenServicioImpl(TokenRepo tokenRepository) throws NoSuchAlgorithmException {
+    public TokenServicioImpl(TokenRepo tokenRepository, UsuarioRepo usuarioRepository) throws NoSuchAlgorithmException {
         this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         this.tokenRepository = tokenRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public String generateToken(String subject) {
@@ -45,18 +49,23 @@ public class TokenServicioImpl implements TokenServicio {
         return tokenString;
     }
 
-    public boolean validateToken(String tokenString) {
+    public boolean validateToken(String tokenString, Usuario usuario) {
         Optional<Token> optionalToken = tokenRepository.findByTokenString(tokenString);
-        if (optionalToken.isPresent()) {
+        Optional<Usuario> optionalUsuario = usuarioRepository.findById(usuario.getId());
+        if (optionalToken.isPresent() && optionalUsuario.isPresent()) {
             Token token = optionalToken.get();
+            Usuario user = optionalUsuario.get();
+            String username = user.getCredential().getUsername();
             LocalDateTime expirationDate = token.getExpirationDate();
             Instant expirationInstant = expirationDate.atZone(ZoneId.systemDefault()).toInstant();
             Instant currentInstant = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
-                if (expirationInstant.isAfter(currentInstant)) {
+
+            if (expirationInstant.isAfter(currentInstant)) {
+                if (getSubjectFromToken(tokenString).equals(username))
                     return true;
-                } else {
-                    tokenRepository.delete(token);
-                }
+            } else {
+                tokenRepository.delete(token);
+            }
         }
         return false;
     }

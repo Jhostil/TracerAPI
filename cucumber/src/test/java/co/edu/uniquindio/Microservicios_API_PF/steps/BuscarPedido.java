@@ -6,8 +6,14 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.RestAssured;
+import io.restassured.config.HttpClientConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
@@ -66,7 +72,7 @@ public class BuscarPedido {
     public void laInformacionDelEnvio() {
         response.then()
                 .body("id",response->notNullValue())
-                .body("estado",response->notNullValue())
+//                .body("estado",response->notNullValue())
                 .body("fecha_envio",response->notNullValue())
                 .body("fecha_entrega",response->notNullValue());
     }

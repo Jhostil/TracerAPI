@@ -47,7 +47,7 @@ public class AgregarEstado {
                 .fecha_envio("10/8/2022/05:00")
                 .fecha_entrega("")
                 .build();
-        System.out.println("Se creó el pedido: " + envio.toString());
+        System.out.println("Se creó el pedido : " + envio.toString());
     }
 
     @When("Hago el llamado del servicio de la Api agregar estado y le envio el estado")

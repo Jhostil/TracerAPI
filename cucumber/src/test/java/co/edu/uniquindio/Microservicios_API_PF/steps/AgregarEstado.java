@@ -77,6 +77,7 @@ public class AgregarEstado {
         response.then().statusCode(status);
     }
 
+
     @And("En el servidor no existe un pedido con id {string}")
     public void enElServidorNoExisteUnPedidoConId(String id_pedido) {
         this.id_pedido = id_pedido;

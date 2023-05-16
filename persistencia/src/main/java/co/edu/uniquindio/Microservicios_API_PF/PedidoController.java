@@ -13,14 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -139,24 +135,6 @@ public class PedidoController {
     {
         Optional<Pedido> pedido = pedidoServicio.findById_pedido(id_pedido);
         return pedido.orElseThrow(() -> new PedidoNotFoundException("Pedido no encontrado."));
-    }
-
-
-    @GetMapping("{id_pedido}/transportadoras")
-    public ResponseEntity<?> obtenerTransportadora (@PathVariable("id_pedido") String id_pedido)
-    {
-        LOGGER.info("Operacion obtener información de la transportadora");
-        Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
-        try {
-
-            Pedido pd = getAndVerify(id_pedido);
-
-            return new ResponseEntity<>(pd,HttpStatus.OK);
-        } catch (PedidoNotFoundException pe) {
-            return new ResponseEntity<>(getRoute(id_pedido), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Hubo un error, por favor intente de nuevo",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @GetMapping("{id_pedido}/datetime_adjust")

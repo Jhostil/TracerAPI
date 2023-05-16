@@ -1,6 +1,9 @@
 package co.edu.uniquindio.Microservicios_API_PF.steps;
 
+import co.edu.uniquindio.Microservicios_API_PF.dto.CredentialDTO;
 import co.edu.uniquindio.Microservicios_API_PF.dto.EnvioDTO;
+import co.edu.uniquindio.Microservicios_API_PF.dto.RolDTO;
+import co.edu.uniquindio.Microservicios_API_PF.dto.UserWithCredentialsDTO;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

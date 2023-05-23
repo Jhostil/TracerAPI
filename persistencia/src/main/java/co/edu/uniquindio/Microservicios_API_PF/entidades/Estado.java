@@ -1,5 +1,6 @@
 package co.edu.uniquindio.Microservicios_API_PF.entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -24,7 +25,10 @@ public class Estado implements Serializable {
     @JsonProperty("descripcion")
     private Descripcion descripcion;
 
+    @ToString.Exclude
+    @JsonIgnoreProperties("estado")
+    @JsonProperty("pedido")
     @ManyToOne
-    @JoinColumn(name = "pedido_id")
+    @JoinColumn(name = "pedido")
     private Pedido pedido;
 }

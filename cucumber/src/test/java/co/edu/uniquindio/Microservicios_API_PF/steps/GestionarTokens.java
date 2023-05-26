@@ -81,7 +81,7 @@ public class GestionarTokens {
         response = RestAssured.given()
                 .contentType(ContentType.JSON)
                 .queryParam("tokenString", token)
-                .queryParam(user.getCorreo())
+                .queryParam("correo",user.getCorreo())
                 .get("http://localhost:8080/tokens/validacion");
     }
 

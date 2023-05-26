@@ -107,8 +107,7 @@ public class PedidoController {
             String[] fecha = pd.getFecha_envio().split("/");
             LocalDateTime time = LocalDateTime.of(Integer.parseInt(fecha[2]),Integer.parseInt(fecha[1]),Integer.parseInt(fecha[0]),0,0);
             time = time.plusDays(10);
-            pd.setFecha_entrega(time.getDayOfMonth()+"/"+time.getMonthValue()+"/"+time.getYear()+"/"+fecha[3]);
-            System.out.println(pd.getFecha_entrega()+"\n"+pd.getFecha_envio());
+            pd.setFecha_entrega(String.format("%02d",time.getDayOfMonth())+"/"+String.format("%02d",time.getMonthValue())+"/"+time.getYear()+"/"+fecha[3]);
             pedidoServicio.save(pd);
             return new ResponseEntity<>(pd,HttpStatus.OK);
         }catch (PedidoNotFoundException pe) {

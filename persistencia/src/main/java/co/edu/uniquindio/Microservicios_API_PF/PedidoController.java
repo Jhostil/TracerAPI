@@ -43,7 +43,7 @@ public class PedidoController {
     @PostMapping("/send-message")
     public ResponseEntity<String> sendMessage(@RequestBody String message) {
         rabbitConfig.sendMessage(message);
-        return ResponseEntity.ok("Mensaje enviado a la cola RabbitMQ exitosamente");
+        return ResponseEntity.ok("Mensaje enviado a la cola RabbitMQ exitosamente!");
     }
 
 

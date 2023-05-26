@@ -2,13 +2,11 @@ package co.edu.uniquindio.Microservicios_API_PF;
 
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Estado;
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Pedido;
-import co.edu.uniquindio.Microservicios_API_PF.entidades.Transportadora;
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Ubicacion;
 import co.edu.uniquindio.Microservicios_API_PF.excepciones.PedidoNotFoundException;
-import co.edu.uniquindio.Microservicios_API_PF.servicios.PedidoServicio;
-import co.edu.uniquindio.Microservicios_API_PF.servicios.TokenServicio;
-import co.edu.uniquindio.Microservicios_API_PF.servicios.TransportadoraServicio;
-import co.edu.uniquindio.Microservicios_API_PF.servicios.UbicacionServicio;
+import co.edu.uniquindio.Microservicios_API_PF.servicios.*;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +37,16 @@ public class PedidoController {
     private UbicacionServicio ubicacionServicio;
 
 
+    @Autowired
+    private RabbitConfig rabbitConfig;
+
+    @PostMapping("/send-message")
+    public ResponseEntity<String> sendMessage(@RequestBody String message) {
+        rabbitConfig.sendMessage(message);
+        return ResponseEntity.ok("Mensaje enviado a la cola RabbitMQ exitosamente");
+    }
+
+
     @PostMapping
     public void create (@RequestBody Pedido pedido)
     {
@@ -48,6 +56,7 @@ public class PedidoController {
         {
             guardarUbicaciones (pedido);
         }
+        rabbitConfig.sendPedido(pedido);
     }
 
     public void guardarUbicaciones (Pedido pedido)

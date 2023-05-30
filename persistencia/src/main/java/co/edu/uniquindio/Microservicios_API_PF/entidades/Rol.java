@@ -3,9 +3,10 @@ package co.edu.uniquindio.Microservicios_API_PF.entidades;
 import java.io.Serializable;
 
 public enum Rol implements Serializable {
-    EMPLEADO("Empleado", "Rol de empleado"),
-    ADMINISTRADOR("Administrador", "Rol de administrador"),
-    USUARIO("Usuario", "Rol de usuario");
+    empleado("Empleado", "Rol de empleado"),
+    administrador("Administrador", "Rol de administrador"),
+
+    cliente("cliente", "Rol de cliente");
 
     private String nombre;
     private String descripcion;

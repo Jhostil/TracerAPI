@@ -2,7 +2,6 @@ package co.edu.uniquindio.Microservicios_API_PF;
 
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Estado;
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Pedido;
-import co.edu.uniquindio.Microservicios_API_PF.entidades.Transportadora;
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Ubicacion;
 import co.edu.uniquindio.Microservicios_API_PF.excepciones.PedidoNotFoundException;
 import co.edu.uniquindio.Microservicios_API_PF.servicios.PedidoServicio;

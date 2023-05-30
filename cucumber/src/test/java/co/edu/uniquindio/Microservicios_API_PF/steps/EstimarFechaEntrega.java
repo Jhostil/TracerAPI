@@ -42,7 +42,7 @@ public class EstimarFechaEntrega {
                 .builder()
                 .id(id_pedido)
                 .estado(estados)
-                .fecha_envio("10/08/2001/05:00")
+                .fecha_envio("10/8/2023/05:00")
                 .fecha_entrega("")
                 .build();
         System.out.println("Se creó el pedido: " + envio.toString());
@@ -67,9 +67,25 @@ public class EstimarFechaEntrega {
         response.then().statusCode(status);
     }
 
-    @And("Me llega la fecha de llegada del pedido")
-    public void meLlegaLaFechaDeLlegadaDelPedido() {
-        response.then()
-                .body("fecha_envio",response->notNullValue());
+    @And("No existe un pedido en el servidor con el id {string}")
+    public void noExisteUnPedidoEnElServidorConElId(String id_pedido) {
+        List<EstadoDTO> estados = new ArrayList<>();
+        estados.add(new EstadoDTO(id_pedido,"llego a New York", DescripcionDTO.EN_BODEGA));
+        envio = EnvioDTO
+                .builder()
+                .id(id_pedido+"a")
+                .estado(estados)
+                .fecha_envio("10/8/2023/05:00")
+                .fecha_entrega("")
+                .build();
+        System.out.println("Se creó el pedido: " + envio.toString());
+    }
+
+    @When("Realizo el llamado al servicio estimar fecha entrega pero la ruta esta mal escrita y le envio el id {string}")
+    public void realizoElLlamadoAlServicioEstimarFechaEntregaPeroLaRutaEstaMalEscritaYLeEnvioElId(String id_pedido) {
+        response = given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer miToken")
+                .get("http://localhost:8080/pedidos/" + id_pedido+"/times");
     }
 }

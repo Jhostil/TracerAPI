@@ -4,15 +4,13 @@ import co.edu.uniquindio.Microservicios_API_PF.entidades.Estado;
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Pedido;
 import co.edu.uniquindio.Microservicios_API_PF.entidades.Ubicacion;
 import co.edu.uniquindio.Microservicios_API_PF.excepciones.PedidoNotFoundException;
-import co.edu.uniquindio.Microservicios_API_PF.servicios.PedidoServicio;
-import co.edu.uniquindio.Microservicios_API_PF.servicios.TokenServicio;
-import co.edu.uniquindio.Microservicios_API_PF.servicios.TransportadoraServicio;
-import co.edu.uniquindio.Microservicios_API_PF.servicios.UbicacionServicio;
+import co.edu.uniquindio.Microservicios_API_PF.servicios.*;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -39,6 +37,16 @@ public class PedidoController {
     private UbicacionServicio ubicacionServicio;
 
 
+    @Autowired
+    private RabbitConfig rabbitConfig;
+
+    @PostMapping("/send-message")
+    public ResponseEntity<String> sendMessage(@RequestBody String message) {
+        rabbitConfig.sendMessage(message);
+        return ResponseEntity.ok("Mensaje enviado a la cola RabbitMQ exitosamente!");
+    }
+
+
     @PostMapping
     public void create (@RequestBody Pedido pedido)
     {
@@ -48,6 +56,7 @@ public class PedidoController {
         {
             guardarUbicaciones (pedido);
         }
+        rabbitConfig.sendPedido(pedido);
     }
 
     public void guardarUbicaciones (Pedido pedido)
@@ -66,14 +75,13 @@ public class PedidoController {
         return new ResponseEntity<>(getAndVerify(id_pedido), HttpStatus.OK);
     }
 
-    @PatchMapping("{id_pedido}/estado")
+    @PatchMapping("{id_pedido}/addEstado")
     private ResponseEntity<String> agregarEstado(@PathVariable String id_pedido, @RequestBody Estado estado) {
         LOGGER.info("Operacion agregando nuevo estado");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
         try {
             Pedido pd = getAndVerify(id_pedido);
             pd.getEstado().add(estado);
-            estado.setId(id_pedido);
             estado.setPedido(pd);
             guardarEstado(estado);
             pedidoServicio.save(pd);
@@ -81,35 +89,31 @@ public class PedidoController {
         }catch (PedidoNotFoundException pe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pe.getMessage());
         }catch (Exception e) {
-            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(e.getMessage());
         }
     }
 
     private void guardarEstado(Estado estado) {
+        LOGGER.info("Se guardó el estado del producto");
         pedidoServicio.saveEstado(estado);
     }
     @GetMapping("{id_pedido}/time")
-    private ResponseEntity<String> estimarFechaEntrega(@PathVariable String id_pedido) {
+    private ResponseEntity<Pedido> estimarFechaEntrega(@PathVariable String id_pedido) {
         LOGGER.info("Operacion estima fecha de entrega de un producto");
         Objects.requireNonNull(id_pedido,"El id del pedido no puede ser nulo");
+        Pedido pd = getAndVerify(id_pedido);
         try {
-            Pedido pd = getAndVerify(id_pedido);
-            pd.setId(id_pedido);
-
-            //Ejemplo de como se debe manejar la fecha "dd/mm/yyyy/hh:mm"
+            //Ejemplo de como se debe manejar la fecha dd/mm/yyyy/hh:mm
             String[] fecha = pd.getFecha_envio().split("/");
-            System.out.println("llegó esto: "+pd.getFecha_envio());
-            LocalDateTime time = LocalDateTime.of(Integer.parseInt(fecha[2]),Integer.parseInt(fecha[1]),Integer.parseInt(fecha[0]),0,0,0);
-            pd.setFecha_entrega(time.plusDays(10).getDayOfMonth()+"/"+time.getMonthValue()+"/"+time.getYear()+"/"+fecha[3]);
-            System.out.println("id:"+pd.getId()+"\nfechaE:"+pd.getFecha_entrega()+"\nfechaEV:"+pd.getFecha_envio());
+            LocalDateTime time = LocalDateTime.of(Integer.parseInt(fecha[2]),Integer.parseInt(fecha[1]),Integer.parseInt(fecha[0]),0,0);
+            time = time.plusDays(10);
+            pd.setFecha_entrega(String.format("%02d",time.getDayOfMonth())+"/"+String.format("%02d",time.getMonthValue())+"/"+time.getYear()+"/"+fecha[3]);
             pedidoServicio.save(pd);
-            return ResponseEntity.ok(pd.getFecha_entrega());
+            return new ResponseEntity<>(pd,HttpStatus.OK);
         }catch (PedidoNotFoundException pe) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pe.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(pd);
         }catch (Exception e) {
-            System.out.println("si era esto");
-            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(pd);
         }
     }
 
@@ -160,6 +164,7 @@ public class PedidoController {
             System.out.println(nuevaFechaEntrega);
             return ResponseEntity.ok(fechaFormateada);
         } else {
+            System.out.println("else");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

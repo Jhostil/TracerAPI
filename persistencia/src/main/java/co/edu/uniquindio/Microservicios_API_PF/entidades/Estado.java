@@ -1,12 +1,10 @@
 package co.edu.uniquindio.Microservicios_API_PF.entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Getter
@@ -18,7 +16,8 @@ import java.io.Serializable;
 public class Estado implements Serializable {
     @Id
     @JsonProperty("id")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
     @JsonProperty("detalle")
     private String detalle;
@@ -26,7 +25,10 @@ public class Estado implements Serializable {
     @JsonProperty("descripcion")
     private Descripcion descripcion;
 
+    @ToString.Exclude
+    @JsonIgnoreProperties("estado")
+    @JsonProperty("pedido")
     @ManyToOne
-    @JoinColumn(name = "pedido_id")
+    @JoinColumn(name = "pedido")
     private Pedido pedido;
 }

@@ -1,30 +1,29 @@
----
 openapi: 3.0.0
 info:
   title: Tracer
   description: API que permite gestionar el servicio de rastreo de los paquetes de los usuarios de la tienda virtual
   version: 1.0.0
 servers:
-- url: http://localhost:8080
-  description: SwaggerHub API Auto Mocking
+  - url: http://localhost:8080
+    description: SwaggerHub API Auto Mocking
 security:
-- application:
-  - read
-  - write
+  - application:
+      - read
+      - write
 paths:
-  /pedidos/{id_pedido}/estado:
+  /pedidos/{id_pedido}/addEstado:
     patch:
       summary: Permite asignar estado a un pedido
-      description: This is an example operation to show how security is applied to the call.
+      description: Agrega un estado específico a un pedido dado su ID.
       parameters:
-      - name: id_pedido
-        in: path
-        description: ID del pedido a actualizar
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: id_pedido
+          in: path
+          description: ID del pedido a actualizar
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -33,119 +32,171 @@ paths:
         required: true
       responses:
         "200":
-          description: OK
+          description: Operación exitosa
+        "400":
+          description: Solicitud incorrecta. El ID del pedido no es válido.
+        "404":
+          description: Pedido no encontrado. El pedido con el ID especificado no existe.
+        "500":
+          description: Error interno del servidor.
   /pedidos/{id_pedido}/tracer:
     get:
-      summary: Permite rastrear de un pedido dado su ID
-      description: Esta operación permite obtener los atributos relacionados a un pedido dado su identificador
+      summary: Permite rastrear un pedido por su ID
+      description: Obtiene la información de rastreo de un pedido dado su ID.
       parameters:
-      - name: id
-        in: path
-        description: ID del pedido a buscar
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Pedido'
-  /pedidos/{id_pedido}:
-    get:
-      summary: Permite buscar un pedido dado su ID
-      description: This is an example operation to show how security is applied to the call.
-      parameters:
-      - name: id
-        in: path
-        description: ID del pedido a buscar
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Pedido'
-  /pedidos/{id_pedido}/time:
-    get:
-      summary: Permite obtener la fecha estimada de entrega de un pedido
-      description: This is an example operation to show how security is applied to the call.
-      parameters:
-      - name: id_pedido
-        in: path
-        description: ID del pedido
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-  /pedidos/{id_pedido}/transportadoras:
-    get:
-      summary: Permite obtener la información de la transportadora encargada de entregar el pedido
-      description: This is an example operation to show how security is applied to the call.
-      parameters:
-      - name: id_pedido
-        in: path
-        description: ID del pedido a consultar
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-  /pedidos/{id_pedido}/datetime_adjust:
-    get:
-      summary: Permite ajustar la zona horaria
-      description: This is an example operation to show how security is applied to the call.
-      parameters:
-      - name: id_pedido
-        in: path
-        description: ID del pedido al cual se le ajustará la zona horaria
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-  /tokens/generacion:
-    post:
-      summary: Genera un token de autenticación
-      description: Permite generar un token de autenticación para un usuario dado
-      parameters:
-        - name: subject
-          in: query
-          description: Nombre del usuario para el cual se generará el token
+        - name: id_pedido
+          in: path
+          description: ID del pedido a buscar
           required: true
-          style: form
-          explode: true
+          style: simple
+          explode: false
           schema:
             type: string
       responses:
         "200":
-          description: OK
+          description: Operación exitosa
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/Pedido'
+        "400":
+          description: Solicitud incorrecta. El ID del pedido no es válido.
+        "404":
+          description: Pedido no encontrado. El pedido con el ID especificado no existe.
+        "500":
+          description: Error interno del servidor.
+  /pedidos/{id_pedido}:
+    get:
+      summary: Permite buscar un pedido por su ID
+      description: Obtiene los detalles de un pedido dado su ID.
+      parameters:
+        - name: id_pedido
+          in: path
+          description: ID del pedido a buscar
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          description: Token de autorización del usuario
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+        "400":
+          description: Solicitud incorrecta. El ID del pedido no es válido o el token de autorización es inválido.
+        "401":
+          description: Acceso no autorizado. El token de autorización es inválido o no tiene los permisos necesarios.
+        "404":
+          description: Pedido no encontrado. El pedido con el ID especificado no existe.
+        "500":
+          description: Error interno del servidor.
+  /pedidos/{id_pedido}/time:
+    get:
+        summary: Permite obtener la fecha estimada de entrega de un pedido
+        description: Obtiene la fecha estimada de entrega de un pedido dado su ID.
+        parameters:
+          - name: id_pedido
+            in: path
+            description: ID del pedido
+            required: true
+            style: simple
+            explode: false
+            schema:
+              type: string
+        responses:
+          "200":
+            description: Operación exitosa
+          "400":
+            description: Solicitud incorrecta. El ID del pedido no es válido.
+          "404":
+            description: Pedido no encontrado. El pedido con el ID especificado no existe.
+          "500":
+            description: Error interno del servidor.
+  /pedidos/{id_pedido}/transportadoras:
+        get:
+          summary: Permite obtener la información de la transportadora encargada de entregar el pedido
+          description: Obtiene la información de la transportadora encargada de entregar un pedido dado su ID.
+          parameters:
+            - name: id_pedido
+              in: path
+              description: ID del pedido a consultar
+              required: true
+              style: simple
+              explode: false
+              schema:
                 type: string
+          responses:
+            "200":
+              description: Operación exitosa
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Transportadora'
+            "400":
+              description: Solicitud incorrecta. El ID del pedido no es válido.
+            "404":
+              description: Pedido no encontrado. El pedido con el ID especificado no existe.
+            "500":
+              description: Error interno del servidor.
+  /pedidos/{id_pedido}/datetime_adjust:
+        get:
+          summary: Permite ajustar la zona horaria
+          description: Ajusta la zona horaria de un pedido dado su ID.
+          parameters:
+            - name: id_pedido
+              in: path
+              description: ID del pedido al cual se le ajustará la zona horaria
+              required: true
+              style: simple
+              explode: false
+              schema:
+                type: string
+          responses:
+            "200":
+              description: Operación exitosa
+            "400":
+              description: Solicitud incorrecta. El ID del pedido no es válido.
+            "404":
+              description: Pedido no encontrado. El pedido con el ID especificado no existe.
+            "500":
+              description: Error interno del servidor.
+  /tokens/generacion:
+        post:
+          summary: Genera un token de autenticación
+          description: Genera un token de autenticación para un usuario dado su nombre.
+          parameters:
+            - name: subject
+              in: query
+              description: Nombre del usuario para el cual se generará el token
+              required: true
+              style: form
+              explode: true
+              schema:
+                type: string
+          responses:
+            "200":
+              description: Operación exitosa
+              content:
+                application/json:
+                  schema:
+                    type: string
+            "400":
+              description: Solicitud incorrecta. El nombre del usuario no es válido.
+            "500":
+              description: Error interno del servidor.
   /tokens/validacion:
     get:
       summary: Valida un token de autenticación
-      description: Permite validar un token de autenticación para un usuario dado
+      description: Valida un token de autenticación para un usuario dado su correo electrónico.
       parameters:
         - name: tokenString
           in: query
@@ -157,7 +208,7 @@ paths:
             type: string
         - name: correo
           in: query
-          description: correo electronico del usuario que quiere validar su token
+          description: Correo electrónico del usuario que desea validar su token
           required: true
           style: form
           explode: true
@@ -165,15 +216,21 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: Operación exitosa
           content:
             application/json:
               schema:
                 type: boolean
+        "400":
+          description: Solicitud incorrecta. El token de autenticación o el correo electrónico no son válidos.
+        "404":
+          description: Usuario no encontrado. No se encontró ningún usuario con el correo electrónico especificado.
+        "500":
+          description: Error interno del servidor.
   /tokens/sujeto:
     get:
       summary: Obtiene el nombre del usuario asociado a un token de autenticación
-      description: Permite obtener el nombre del usuario asociado a un token de autenticación
+      description: Obtiene el nombre del usuario asociado a un token de autenticación dado su valor.
       parameters:
         - name: tokenString
           in: query
@@ -185,20 +242,54 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: Operación exitosa
           content:
             application/json:
               schema:
                 type: string
+        "400":
+          description: Solicitud incorrecta. El token de autenticación no es válido.
+        "404":
+          description: Usuario no encontrado. No se encontró ningún usuario asociado al token de autenticación.
+        "500":
+          description: Error interno del servidor.
+  /pedidos:
+    post:
+      summary: Crea un nuevo pedido
+      description: Este endpoint crea un nuevo pedido y guarda las ubicaciones asociadas si las hay.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pedido'
+      responses:
+        "201":
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+        "400":
+          description: Solicitud incorrecta. El objeto Pedido proporcionado no es válido.
+        "409":
+          description: Conflicto. Ya existe un pedido con el mismo ID.
+        "500":
+          description: Error interno del servidor.
 components:
   schemas:
+    id_pedido_estado_body:
+      type: object
+      properties:
+        estado_envio:
+          type: string
+          example: entregado
     Pedido:
       type: object
       properties:
         id:
           type: string
         estado_envio:
-          type: array
+          type: object
         fecha_envio:
           type: string
         fecha_entrega:
@@ -221,18 +312,15 @@ components:
               type: string
             telefono:
               type: string
-    id_pedido_estado_body:
+    Transportadora:
       type: object
       properties:
-        id:
+        nombre:
           type: string
-        detalle:
+        direccion:
           type: string
-        descripcion:
-          type: object
-          properties:
-            descripcion:
-              type: string
+        telefono:
+          type: string
     Usuario:
       type: object
       properties:
@@ -256,11 +344,9 @@ components:
             rol:
               type: string
               enum:
-                - EMPLEADO
-                - ADMINISTRADOR
-                - USUARIO
+                - empleado
+                - cliente
+                - administrador
               description: Rol del usuario
-
-
 
 

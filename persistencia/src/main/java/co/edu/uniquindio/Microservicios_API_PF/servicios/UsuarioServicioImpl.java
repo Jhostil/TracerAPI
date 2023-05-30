@@ -26,8 +26,8 @@ public class UsuarioServicioImpl implements UsuarioServicio {
         if (optionalUsuario.isPresent()) {
             throw new UsuarioRegistradoException("El correo ya se encuentra registrado");
         }
-        Credential credential = credentialServicio.crearCredential(usuario.getCredential());
-        usuario.setCredential(credential);
+        //Credential credential = credentialServicio.crearCredential(usuario.getCredential());
+        //usuario.setCredential(credential);
         return usuarioRepo.save(usuario);
     }
 

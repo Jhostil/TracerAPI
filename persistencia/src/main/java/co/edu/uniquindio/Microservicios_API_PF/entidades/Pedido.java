@@ -21,6 +21,7 @@ public class Pedido implements Serializable {
 
     @ToString.Exclude
     @JsonProperty("estado")
+    @JsonIgnoreProperties("pedido")
     @OneToMany(mappedBy = "pedido")
     private List<Estado> estado;
 

@@ -32,6 +32,7 @@ public class TokenController {
         Optional<Usuario> usuario = usuarioServicio.obtenerUsuarioPorCorreo(correo);
         if(usuario.isPresent()){
             boolean isValid = tokenService.validateToken(tokenString, usuario.get());
+            System.out.println("Entre");
             return ResponseEntity.ok(isValid);
         }else
             throw new RuntimeException("El usuario buscado no ha sido encontrado");

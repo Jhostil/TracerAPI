@@ -47,7 +47,6 @@ public class TransformarFecha {
 
     @When("el usuario convierte la fecha de entrega a la zona horaria de {string}")
     public void elUsuarioConvierteLaFechaDeEntregaALaZonaHorariaDe(String zonaHoraria) {
-
         response = RestAssured.given()
                 .queryParam("zona_horaria", zonaHoraria)
                 .when()

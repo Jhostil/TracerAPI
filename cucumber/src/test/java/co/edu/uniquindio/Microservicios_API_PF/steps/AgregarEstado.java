@@ -1,9 +1,6 @@
 package co.edu.uniquindio.Microservicios_API_PF.steps;
 
-import co.edu.uniquindio.Microservicios_API_PF.dto.DescripcionDTO;
-import co.edu.uniquindio.Microservicios_API_PF.dto.EnvioDTO;
-import co.edu.uniquindio.Microservicios_API_PF.dto.EstadoDTO;
-import co.edu.uniquindio.Microservicios_API_PF.dto.UsuarioDTO;
+import co.edu.uniquindio.Microservicios_API_PF.dto.*;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -40,13 +37,15 @@ public class AgregarEstado {
     public void enElServidorExisteUnPedidoConId(String id_pedido) {
         this.id_pedido = id_pedido;
         List<EstadoDTO> estados = new ArrayList<>();
+        List<UbicacionDTO> ubicaciones = new ArrayList<>();
         estados.add(new EstadoDTO(id_pedido,"llego a New York",DescripcionDTO.EN_BODEGA));
         envio = EnvioDTO
                 .builder()
                 .id(id_pedido)
                 .estado(estados)
-                .fecha_envio("2023-03-05T10:30:00")
-                .fecha_entrega("2023-04-14T09:00:00")
+                .ubicaciones(ubicaciones)
+                .fecha_envio("10/8/2022/05:00")
+                .fecha_entrega("")
                 .build();
         System.out.println("Se creó el pedido: " + envio.toString());
     }
@@ -69,18 +68,30 @@ public class AgregarEstado {
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer miToken")
                 .body(estado)
-                .queryParam(estado.getId_pedido())
-                .patch("http://localhost:8080/pedidos/" + estado.getId_pedido() + "/estado");
+                .queryParam(id_pedido)
+                .patch("http://localhost:8080/pedidos/" + estado.getId_pedido() + "/addEstado");
     }
 
     @Then("Recibo un estado {int}")
     public void reciboUnEstado(int status) {
         response.then().statusCode(status);
-        given()
-                .contentType(ContentType.JSON)
-                .header("Authorization", "Bearer miToken")
-                .body(estado)
-                .queryParam(estado.getId_pedido())
-                .delete("http://localhost:8080/pedidos/eliminación");
+    }
+
+
+    @And("En el servidor no existe un pedido con id {string}")
+    public void enElServidorNoExisteUnPedidoConId(String id_pedido) {
+        this.id_pedido = id_pedido;
+        List<EstadoDTO> estados = new ArrayList<>();
+        List<UbicacionDTO> ubicaciones = new ArrayList<>();
+        estados.add(new EstadoDTO(id_pedido,"llego a New York",DescripcionDTO.EN_BODEGA));
+        envio = EnvioDTO
+                .builder()
+                .id(id_pedido+"a")
+                .estado(estados)
+                .ubicaciones(ubicaciones)
+                .fecha_envio("10/8/2023/05:00")
+                .fecha_entrega("")
+                .build();
+        System.out.println("Se creó el pedido: " + envio.toString());
     }
 }
